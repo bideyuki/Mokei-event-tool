@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!--
+  協賛提案書ジェネレーター
+  アイコン: Lucide (https://lucide.dev) - ISC License
+  Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT).
+  All other copyright (c) for Lucide are held by Lucide Contributors 2022.
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>協賛提案書ジェネレーター</title>
+<style>
+  :root{
+    --ink:#1d2530; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
+    --paper:#eef2f6; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
+    --plan-ume:#7a8794; --plan-take:#2f6f8f; --plan-matsu:#b8862b;
+    --radius:10px; --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
+    --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
+    --font-body:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    --font-num:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  [data-lucide]{width:1em;height:1em;vertical-align:-.14em}
+  svg.lucide{width:1em;height:1em;vertical-align:-.14em}
+  body{margin:0;font-family:var(--font-body);color:var(--ink);background:var(--paper);
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:780px;margin:0 auto;padding:24px 18px 90px}
+
+  header.top{padding:18px 0 8px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
+  h1{font-family:var(--font-disp);margin:6px 0 4px;font-size:clamp(19px,5.6vw,26px)}
+  .sub{color:var(--ink-soft);font-size:13px;margin:0}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px;margin:18px 0}
+  .panel h2{font-family:var(--font-disp);font-size:18px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .panel h2 [data-lucide],.panel h2 svg{color:var(--accent)}
+  .panel .lead{color:var(--ink-soft);font-size:13px;margin:0 0 14px}
+
+  .field{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .field:last-child{border-bottom:none}
+  .field .ic{font-size:18px;color:var(--ink-soft);flex:0 0 auto}
+  .field .lb{flex:1 1 34%;font-size:14px;min-width:0}
+  .field .lb small{display:block;color:var(--ink-soft);font-size:11px}
+  .field .in{flex:1 1 60%;display:flex;align-items:center;gap:6px;justify-content:flex-end}
+  .field input,.field textarea{font-family:var(--font-body);font-size:14px;padding:8px 10px;
+    border:1px solid var(--line-strong);border-radius:7px;background:#fff;width:100%}
+  .field input[type=number]{text-align:right;font-family:var(--font-num);max-width:150px}
+  .field input:focus,.field textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+  .field .unit{font-size:12px;color:var(--ink-soft);flex:0 0 auto}
+  .date-in{flex-wrap:wrap;gap:6px !important;justify-content:flex-start !important}
+  .date-in input[type=date],.date-in input[type=time]{width:auto;flex:0 0 auto;
+    font-family:var(--font-body);font-size:13px;padding:7px 8px;border:1px solid var(--line-strong);
+    border-radius:7px;background:#fff;color:var(--ink)}
+  .date-in input[type=date]{flex:1 1 100%}
+  .date-in .tilde{font-size:12px;color:var(--ink-soft);align-self:center}
+  @media(max-width:560px){
+    .field{flex-wrap:wrap}
+    .field .lb{flex:1 1 auto;order:2}
+    .field .ic{order:1;padding-top:2px}
+    .field .in{order:3;flex:1 0 100%;padding-left:28px}
+  }
+
+  /* プラン金額 */
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:560px){.plans{grid-template-columns:1fr}}
+  .plan-card{border:1px solid var(--line);border-radius:9px;padding:12px;text-align:center}
+  .plan-card .pn{font-family:var(--font-disp);font-size:16px;font-weight:700}
+  .plan-card.ume .pn{color:var(--plan-ume)} .plan-card.take .pn{color:var(--plan-take)}
+  .plan-card.matsu .pn{color:var(--plan-matsu)}
+  .plan-card input{width:100%;margin-top:8px;text-align:right;font-family:var(--font-num);
+    font-size:15px;padding:8px;border:1px solid var(--line-strong);border-radius:7px}
+  .plan-card .yen{font-size:11px;color:var(--ink-soft);margin-top:4px}
+
+  /* 見返りメニュー */
+  .benefit-group{margin:6px 0 14px}
+  .bg-h{font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--ink-soft);
+    margin:12px 0 6px;display:flex;align-items:center;gap:6px}
+  .benefit{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center;
+    padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .benefit .bl{min-width:0}
+  .benefit .col-h{font-size:10px;color:var(--ink-soft);text-align:center;width:42px}
+  .benefit .cb{width:42px;display:flex;justify-content:center}
+  .benefit input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+  .bhead{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;
+    padding-bottom:4px;border-bottom:2px solid var(--line-strong)}
+  .bhead .s{width:42px;text-align:center;font-size:10px;font-weight:700}
+  .bhead .s.ume{color:var(--plan-ume)} .bhead .s.take{color:var(--plan-take)}
+  .bhead .s.matsu{color:var(--plan-matsu)}
+  .bhead .lbl{font-size:11px;color:var(--ink-soft);font-weight:700}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  button.btn{font-family:var(--font-body);font-size:14px;font-weight:700;border-radius:8px;
+    padding:11px 20px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);
+    color:#fff;display:inline-flex;align-items:center;gap:7px}
+  button.btn:hover{opacity:.88}
+  button.btn.accent{background:var(--accent);border-color:var(--accent)}
+  .hint{font-size:12px;color:var(--ink-soft)}
+
+  /* ===== 提案書プレビュー（対外文書の紙面） ===== */
+  #docWrap{margin-top:8px}
+  .doc-note{font-family:var(--font-disp);font-size:14px;color:var(--ink-soft);margin:22px 0 8px}
+  .sheet{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);
+    width:100%;max-width:794px;margin:0 auto 18px;padding:24px 22px;position:relative}
+  .sheet .doc-disp{font-family:var(--font-disp)}
+  /* 表紙（画面では内容量に応じた高さ、印刷で1ページに広がる） */
+  .cover{text-align:center;padding:40px 0}
+  .cover .ribbon{font-size:12px;letter-spacing:.3em;color:var(--accent);font-weight:700;margin-bottom:20px}
+  .cover h2{font-family:var(--font-disp);font-size:28px;margin:0 0 10px;line-height:1.4}
+  .cover .evt{font-size:15px;color:var(--ink-soft);margin-bottom:30px}
+  .cover .to{font-size:14px;margin-top:40px;color:var(--ink)}
+  .cover .from{font-size:13px;color:var(--ink-soft);margin-top:8px}
+  .cover .divider{width:60px;height:2px;background:var(--accent);margin:22px auto}
+  /* 中面共通 */
+  .sheet h3.dh{font-family:var(--font-disp);font-size:19px;margin:0 0 14px;
+    padding-bottom:8px;border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:8px}
+  .sheet h3.dh [data-lucide],.sheet h3.dh svg{color:var(--accent);font-size:18px;flex:0 0 auto}
+  .info-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+  .info-tbl th,.info-tbl td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+  .info-tbl th{width:34%;color:var(--ink-soft);font-weight:700}
+  .merit{font-size:13px;line-height:1.9;margin:0 0 14px}
+  .merit-list{list-style:none;padding:0;margin:10px 0 0}
+  .merit-list li{padding:6px 0 6px 26px;position:relative;font-size:13px}
+  .merit-list li::before{content:"";position:absolute;left:4px;top:11px;width:8px;height:8px;
+    background:var(--accent);border-radius:2px;transform:rotate(45deg)}
+  /* プラン表 */
+  .plan-tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+  .plan-tbl th,.plan-tbl td{border:1px solid var(--line-strong);padding:8px 6px;text-align:center;
+    word-break:break-word}
+  .plan-tbl col.c-name{width:40%}
+  .plan-tbl thead th{font-family:var(--font-disp);font-size:14px}
+  .plan-tbl thead th.ume{color:var(--plan-ume)} .plan-tbl thead th.take{color:var(--plan-take)}
+  .plan-tbl thead th.matsu{color:var(--plan-matsu)}
+  .plan-tbl .price{font-family:var(--font-num);font-weight:700;font-size:13px}
+  .plan-tbl td.bname{text-align:left;font-size:12px}
+  .plan-tbl td.cat{background:#f3f6f8;text-align:left;font-weight:700;font-size:11px;color:var(--ink-soft)}
+  .plan-tbl .yes{color:var(--accent)}
+  .plan-tbl .no{color:var(--line-strong)}
+  .contact-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+  .contact-tbl th,.contact-tbl td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}
+  .contact-tbl th{width:34%;color:var(--ink-soft)}
+  .doc-foot{margin-top:24px;padding-top:14px;font-size:10px;color:var(--ink-soft);
+    text-align:center;border-top:1px solid var(--line)}
+
+  @media print{
+    @page{size:A4;margin:14mm}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0;margin:0}
+    .no-print{display:none !important}
+    #docWrap{margin:0}
+    .sheet{box-shadow:none;border:none;max-width:none;width:auto;margin:0;padding:0;
+      break-after:page;page-break-after:always}
+    .sheet:last-child{break-after:auto;page-break-after:auto}
+    .cover{padding:120px 0}
+    .info-tbl,.contact-tbl{break-inside:avoid}
+    .plan-tbl tr{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top no-print">
+    <div class="eyebrow">SPONSOR PROPOSAL GENERATOR</div>
+    <h1>協賛提案書ジェネレーター</h1>
+    <p class="sub">協賛のお願いを、企業に伝わる提案書に。情報を入れると、松竹梅プランつきの提案書ができます。</p>
+  </header>
+
+  <section class="panel no-print">
+    <h2><i data-lucide="clipboard-list"></i> イベント情報</h2>
+    <p class="lead">提案書の表紙と概要に使われます。</p>
+    <div class="field"><span class="ic"><i data-lucide="type"></i></span>
+      <span class="lb">イベント名</span>
+      <span class="in"><input type="text" id="evName" placeholder="例：XXX模型展示会"></span></div>
+    <div class="field date-field"><span class="ic"><i data-lucide="calendar"></i></span>
+      <span class="lb">開催日（初日）<small>日付と時間を選択</small></span>
+      <span class="in date-in">
+        <input type="date" id="d1date">
+        <input type="time" id="d1start"><span class="tilde">〜</span><input type="time" id="d1end">
+      </span></div>
+    <div class="field date-field"><span class="ic"><i data-lucide="calendar"></i></span>
+      <span class="lb">開催日（2日目）<small>2日間開催のときのみ入力。単日なら空欄</small></span>
+      <span class="in date-in">
+        <input type="date" id="d2date">
+        <input type="time" id="d2start"><span class="tilde">〜</span><input type="time" id="d2end">
+      </span></div>
+    <div class="field"><span class="ic"><i data-lucide="map-pin"></i></span>
+      <span class="lb">会場・地域</span>
+      <span class="in"><input type="text" id="evPlace" placeholder="例：東京都品川区・○○産業会館"></span></div>
+    <div class="field"><span class="ic"><i data-lucide="users"></i></span>
+      <span class="lb">想定来場者数</span>
+      <span class="in"><input type="number" id="evVisitors" min="0" placeholder="200"><span class="unit">名</span></span></div>
+    <div class="field"><span class="ic"><i data-lucide="users"></i></span>
+      <span class="lb">来場者層<small>企業が接点を持ちたい層</small></span>
+      <span class="in"><input type="text" id="evAudience" placeholder="例：模型・ホビー愛好者、家族連れ"></span></div>
+    <div class="field"><span class="ic"><i data-lucide="store"></i></span>
+      <span class="lb">出展規模</span>
+      <span class="in"><input type="text" id="evScale" placeholder="例：出展50組・展示作品300点"></span></div>
+  </section>
+
+  <section class="panel no-print">
+    <h2><i data-lucide="building-2"></i> 主催者情報</h2>
+    <p class="lead">提案書の差出人・連絡先に使われます。</p>
+    <div class="field"><span class="ic"><i data-lucide="building-2"></i></span>
+      <span class="lb">主催者名<small>団体名・個人名</small></span>
+      <span class="in"><input type="text" id="orgName" placeholder="例：ミカモコ実行委員会"></span></div>
+    <div class="field"><span class="ic"><i data-lucide="type"></i></span>
+      <span class="lb">担当者名</span>
+      <span class="in"><input type="text" id="orgPerson" placeholder="例：山田 太郎"></span></div>
+    <div class="field"><span class="ic"><i data-lucide="file-text"></i></span>
+      <span class="lb">連絡先<small>メール・SNS等</small></span>
+      <span class="in"><input type="text" id="orgContact" placeholder="例：example@mail.com / X:@______"></span></div>
+  </section>
+
+  <section class="panel no-print">
+    <h2><i data-lucide="coins"></i> 協賛プランの金額</h2>
+    <p class="lead">松・竹・梅の3プラン。金額を入れてください（名称は固定）。</p>
+    <div class="plans">
+      <div class="plan-card ume"><div class="pn">梅</div>
+        <input type="number" id="priceUme" min="0" placeholder="30000"><div class="yen">円</div></div>
+      <div class="plan-card take"><div class="pn">竹</div>
+        <input type="number" id="priceTake" min="0" placeholder="50000"><div class="yen">円</div></div>
+      <div class="plan-card matsu"><div class="pn">松</div>
+        <input type="number" id="priceMatsu" min="0" placeholder="100000"><div class="yen">円</div></div>
+    </div>
+  </section>
+
+  <section class="panel no-print">
+    <h2><i data-lucide="badge-check"></i> 協賛の見返り</h2>
+    <p class="lead">各プランに含める見返りをチェックしてください。上位プランほど手厚くするのが定石です。</p>
+    <div class="bhead">
+      <span class="lbl">見返りの内容</span>
+      <span class="s ume">梅</span><span class="s take">竹</span><span class="s matsu">松</span>
+    </div>
+    <div id="benefits"></div>
+  </section>
+
+  <section class="panel no-print">
+    <h2><i data-lucide="file-text"></i> 提案書をつくる</h2>
+    <p class="lead">入力内容から提案書を生成します。プレビューを確認し、印刷ボタンからPDF保存・印刷できます。</p>
+    <div class="toolbar">
+      <button class="btn accent" onclick="buildDoc()"><i data-lucide="sparkles"></i> 提案書を生成・更新</button>
+      <button class="btn" onclick="window.print()"><i data-lucide="printer"></i> 印刷 / PDF保存</button>
+      <span class="hint" id="docHint"></span>
+    </div>
+  </section>
+
+  <div id="docWrap"></div>
+</div>
+
+<script>
+/* Lucide icons (ISC License) - Copyright (c) Lucide Contributors. https://lucide.dev/license */
+const ICONS={
+  "handshake":"<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />",
+  "calendar":"<path d=\"M8 2v4\" /> <path d=\"M16 2v4\" /> <rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\" /> <path d=\"M3 10h18\" />",
+  "map-pin":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />",
+  "users":"<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />",
+  "building-2":"<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />",
+  "megaphone":"<path d=\"M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z\" /> <path d=\"M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14\" /> <path d=\"M8 6v8\" />",
+  "store":"<path d=\"M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5\" /> <path d=\"M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244\" /> <path d=\"M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05\" />",
+  "award":"<path d=\"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526\" /> <circle cx=\"12\" cy=\"8\" r=\"6\" />",
+  "mic":"<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />",
+  "sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />",
+  "printer":"<path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\" /> <path d=\"M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6\" /> <rect x=\"6\" y=\"14\" width=\"12\" height=\"8\" rx=\"1\" />",
+  "file-text":"<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M10 9H8\" /> <path d=\"M16 13H8\" /> <path d=\"M16 17H8\" />",
+  "clipboard-list":"<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\" /> <path d=\"M12 11h4\" /> <path d=\"M12 16h4\" /> <path d=\"M8 11h.01\" /> <path d=\"M8 16h.01\" />",
+  "check":"<path d=\"M20 6 9 17l-5-5\" />",
+  "circle-check":"<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m9 12 2 2 4-4\" />",
+  "chevron-down":"<path d=\"m6 9 6 6 6-6\" />",
+  "type":"<path d=\"M12 4v16\" /> <path d=\"M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2\" /> <path d=\"M9 20h6\" />",
+  "coins":"<path d=\"M13.744 17.736a6 6 0 1 1-7.48-7.48\" /> <path d=\"M15 6h1v4\" /> <path d=\"m6.134 14.768.866-.5 2 3.464\" /> <circle cx=\"16\" cy=\"8\" r=\"6\" />",
+  "arrow-right":"<path d=\"M5 12h14\" /> <path d=\"m12 5 7 7-7 7\" />",
+  "badge-check":"<path d=\"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z\" /> <path d=\"m9 12 2 2 4-4\" />",
+};
+function svg(name){const i=ICONS[name];if(!i)return"";
+  return `<svg class="lucide lucide-${name}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg>`;}
+function refreshIcons(){document.querySelectorAll('[data-lucide]').forEach(el=>{
+  const n=el.getAttribute('data-lucide');if(!ICONS[n])return;el.outerHTML=svg(n);});}
+
+/* ===== 見返りメニュー（実体験3分類） ===== */
+const BENEFITS=[
+  {cat:"露出・掲示", icon:"megaphone", items:[
+    {id:"logo-flyer", label:"チラシ・ポスターにロゴ掲載"},
+    {id:"banner", label:"会場内にバナー・のぼり掲示"},
+    {id:"sns", label:"公式SNSで紹介・お礼投稿"},
+    {id:"web", label:"公式サイト・告知ページに掲載"},
+  ]},
+  {cat:"現場接点", icon:"store", items:[
+    {id:"booth", label:"PR・物販ブースの出展枠"},
+    {id:"sample", label:"サンプル・チラシの配布"},
+    {id:"display", label:"商品・製品の展示スペース"},
+  ]},
+  {cat:"コンテンツ", icon:"award", items:[
+    {id:"prize", label:"協賛社名を冠した賞の設置"},
+    {id:"talk", label:"登壇・挨拶・PRタイムの枠"},
+    {id:"collab", label:"企画コラボ・共同コンテンツ"},
+  ]},
+];
+const PLAN_KEYS=["ume","take","matsu"];
+const PLAN_LABEL={ume:"梅", take:"竹", matsu:"松"};
+// 選択状態: benefitId -> {ume:bool, take:bool, matsu:bool}
+const sel={};
+BENEFITS.forEach(g=>g.items.forEach(it=>sel[it.id]={ume:false,take:false,matsu:false}));
+
+function renderBenefits(){
+  const mount=document.getElementById("benefits");
+  let html="";
+  BENEFITS.forEach(g=>{
+    html+=`<div class="bg-h">${svg(g.icon)} ${g.cat}</div>`;
+    g.items.forEach(it=>{
+      html+=`<div class="benefit"><span class="bl">${it.label}</span>`+
+        PLAN_KEYS.map(p=>`<span class="cb"><input type="checkbox" data-id="${it.id}" data-plan="${p}"></span>`).join('')+
+        `</div>`;
+    });
+  });
+  mount.innerHTML=html;
+  mount.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.onchange=()=>{ sel[cb.dataset.id][cb.dataset.plan]=cb.checked; };
+  });
+}
+
+/* ===== 値取得 ===== */
+function v(id){return (document.getElementById(id).value||"").trim();}
+function yen(n){n=parseInt(n,10);if(!n||n<0)return "—";return "¥"+n.toLocaleString("ja-JP");}
+
+/* 日付・時間を提案書用に整形。2日目が空なら単日 */
+const WD=["日","月","火","水","木","金","土"];
+function fmtDate(iso){ // "2027-05-03" → "2027年5月3日（月）"
+  if(!iso) return "";
+  const [y,m,d]=iso.split("-").map(Number);
+  const wd=WD[new Date(y,m-1,d).getDay()];
+  return `${y}年${m}月${d}日（${wd}）`;
+}
+function fmtTime(s,e){ // "10:00","16:00" → "10:00〜16:00"（両方あるとき）
+  if(s&&e) return `${s}〜${e}`;
+  if(s) return `${s}〜`;
+  return "";
+}
+function formatEventDate(){
+  const d1=v("d1date"), d1s=v("d1start"), d1e=v("d1end");
+  const d2=v("d2date"), d2s=v("d2start"), d2e=v("d2end");
+  if(!d1) return "";
+  const t1=fmtTime(d1s,d1e);
+  if(!d2){ // 単日
+    return t1 ? `${fmtDate(d1)} ${t1}` : fmtDate(d1);
+  }
+  // 2日間
+  const t2=fmtTime(d2s,d2e);
+  const line1 = t1 ? `${fmtDate(d1)} ${t1}` : fmtDate(d1);
+  const line2 = t2 ? `${fmtDate(d2)} ${t2}` : fmtDate(d2);
+  return `${line1}／${line2}`;
+}
+
+/* ===== 提案書生成 ===== */
+function buildDoc(){
+  const evName=v("evName")||"（イベント名）";
+  const evDate=formatEventDate(), evPlace=v("evPlace"), evVisitors=v("evVisitors"),
+        evAudience=v("evAudience"), evScale=v("evScale");
+  const orgName=v("orgName")||"（主催者名）", orgPerson=v("orgPerson"), orgContact=v("orgContact");
+  const prices={ume:v("priceUme"),take:v("priceTake"),matsu:v("priceMatsu")};
+
+  // 表紙
+  let html=`<div class="doc-note no-print">提案書プレビュー（A4・印刷／PDF保存できます）</div>`;
+  html+=`<div class="sheet"><div class="cover">
+    <div class="ribbon">協賛のご案内</div>
+    <h2>${evName}<br>協賛のお願い</h2>
+    <div class="divider"></div>
+    <div class="evt">${[evDate,evPlace].filter(Boolean).map(x=>`<div>${x}</div>`).join("")||"開催概要"}</div>
+    <div class="to" style="margin-top:60px">協賛企業ご担当者様</div>
+    <div class="from">${orgName}${orgPerson?"　"+orgPerson:""}</div>
+  </div></div>`;
+
+  // 概要＋メリット
+  const infoRows=[
+    ["イベント名",evName],["開催日",evDate.replace("／","<br>")],["会場",evPlace],
+    ["想定来場者数",evVisitors?evVisitors+"名":""],["来場者層",evAudience],["出展規模",evScale],
+  ].filter(r=>r[1]);
+  html+=`<div class="sheet"><h3 class="dh">${svg('clipboard-list')} イベント概要</h3>
+    <table class="info-tbl">${infoRows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}</table>
+    <h3 class="dh">${svg('handshake')} 協賛いただくメリット</h3>
+    <p class="merit">本イベントは${evAudience?`「${evAudience}」`:"模型・ホビーを愛する来場者"}が集まる場です。${evVisitors?`想定来場者数は${evVisitors}名。`:""}貴社にとって、ターゲット層へ直接リーチできる機会となります。</p>
+    <ul class="merit-list">
+      <li>関心の高い来場者層への、的確なブランド露出</li>
+      <li>会場・告知物・SNSを通じた継続的な認知獲得</li>
+      <li>現場での直接的な顧客接点（配布・展示・ブース）</li>
+      <li>地域・コミュニティとの関係構築、社会貢献の発信</li>
+    </ul>
+    <div class="doc-foot">${evName}　協賛のご案内</div>
+  </div>`;
+
+  // プラン表
+  const activeBenefits=[];
+  BENEFITS.forEach(g=>{
+    const rows=g.items.filter(it=>sel[it.id].ume||sel[it.id].take||sel[it.id].matsu);
+    if(rows.length) activeBenefits.push({cat:g.cat,rows});
+  });
+  let planTable=`<table class="plan-tbl"><colgroup><col class="c-name"><col><col><col></colgroup><thead><tr><th style="text-align:left">協賛内容</th>
+    <th class="ume">梅</th><th class="take">竹</th><th class="matsu">松</th></tr>
+    <tr><td class="bname" style="font-weight:700">協賛金額</td>
+      <td class="price">${yen(prices.ume)}</td><td class="price">${yen(prices.take)}</td><td class="price">${yen(prices.matsu)}</td></tr>
+    </thead><tbody>`;
+  if(activeBenefits.length===0){
+    planTable+=`<tr><td colspan="4" style="padding:16px;color:var(--ink-soft)">見返りを選択すると、ここに一覧が表示されます。</td></tr>`;
+  }else{
+    activeBenefits.forEach(g=>{
+      planTable+=`<tr><td class="cat" colspan="4">${g.cat}</td></tr>`;
+      g.rows.forEach(it=>{
+        planTable+=`<tr><td class="bname">${it.label}</td>`+
+          PLAN_KEYS.map(p=>sel[it.id][p]?`<td class="yes">${svg('check')}</td>`:`<td class="no">—</td>`).join('')+
+          `</tr>`;
+      });
+    });
+  }
+  planTable+=`</tbody></table>`;
+  html+=`<div class="sheet"><h3 class="dh">${svg('badge-check')} 協賛プラン</h3>
+    ${planTable}
+    <p class="merit" style="margin-top:14px;font-size:12px;color:var(--ink-soft)">
+    ※ 上記は基本プランです。ご要望に応じて内容の調整も承ります。</p>
+    <div class="doc-foot">${evName}　協賛のご案内</div>
+  </div>`;
+
+  // 申込・連絡先
+  html+=`<div class="sheet"><h3 class="dh">${svg('file-text')} お申し込み・お問い合わせ</h3>
+    <p class="merit">本ご案内をご検討いただき、ありがとうございます。ご協賛・ご質問は下記までご連絡ください。担当者より詳細をご案内いたします。</p>
+    <table class="contact-tbl">
+      <tr><th>主催</th><td>${orgName}</td></tr>
+      ${orgPerson?`<tr><th>担当者</th><td>${orgPerson}</td></tr>`:""}
+      ${orgContact?`<tr><th>連絡先</th><td>${orgContact}</td></tr>`:""}
+    </table>
+    <p class="merit" style="margin-top:30px;text-align:center;font-family:var(--font-disp);font-size:15px">
+    ${evName} を、ぜひ一緒に盛り上げてください。</p>
+    <div class="doc-foot">${evName}　協賛のご案内</div>
+  </div>`;
+
+  document.getElementById("docWrap").innerHTML=html;
+  refreshIcons();
+  document.getElementById("docHint").textContent="提案書を更新しました。";
+  const dw=document.getElementById("docWrap");
+  if(dw.scrollIntoView) dw.scrollIntoView({behavior:"smooth"});
+}
+
+/* ===== 起動 ===== */
+renderBenefits();
+refreshIcons();
+</script>
+</body>
+</html>

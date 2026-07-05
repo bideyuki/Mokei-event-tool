@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!--
+  模型イベント運営ツールキット ポータル
+  アイコン: Lucide (https://lucide.dev) - ISC License
+  Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT).
+  All other copyright (c) for Lucide are held by Lucide Contributors 2022.
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型イベント運営ツールキット</title>
+<style>
+  :root{
+    --ink:#1d2530; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
+    --paper:#eef2f6; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
+    --plan:#2f6f8f; --budget:#b8862b; --day:#2e7d57;
+    --radius:12px; --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
+    --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
+    --font-body:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  [data-lucide]{width:1em;height:1em;vertical-align:-.14em}
+  svg.lucide{width:1em;height:1em;vertical-align:-.14em}
+  body{margin:0;font-family:var(--font-body);color:var(--ink);background:var(--paper);
+    line-height:1.7;font-size:15px}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+
+  header.hero{text-align:center;padding:20px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:26px}
+  .eyebrow{font-size:11px;letter-spacing:.24em;color:var(--accent);font-weight:700}
+  h1{font-family:var(--font-disp);margin:10px 0 8px;font-size:clamp(20px,6.2vw,30px);white-space:nowrap}
+  .hero p{color:var(--ink-soft);font-size:14px;margin:0 auto;max-width:30em}
+
+  .intro{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px 22px;margin-bottom:26px}
+  .intro p{margin:0;font-size:14px}
+  .intro p+p{margin-top:10px;color:var(--ink-soft);font-size:13px}
+
+  .sec-label{font-family:var(--font-disp);font-size:16px;margin:0 0 4px}
+  .sec-note{color:var(--ink-soft);font-size:13px;margin:0 0 16px}
+
+  .tools{display:flex;flex-direction:column;gap:16px}
+  a.tool{display:block;text-decoration:none;color:inherit;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:20px 22px;transition:transform .12s, box-shadow .12s, border-color .12s;position:relative}
+  a.tool:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(29,37,48,.1),0 14px 34px rgba(29,37,48,.09);
+    border-color:var(--line-strong)}
+  .tool .top{display:flex;align-items:center;gap:12px}
+  .tool .badge{width:46px;height:46px;flex:0 0 auto;border-radius:11px;display:flex;
+    align-items:center;justify-content:center;font-size:24px;color:#fff}
+  .tool.plan .badge{background:var(--plan)} .tool.budget .badge{background:var(--budget)}
+  .tool.day .badge{background:var(--day)}
+  .tool.sponsor .badge{background:var(--accent)}
+  .tool.sponsor .step{color:var(--accent)}
+  .tool .step{font-size:11px;letter-spacing:.08em;font-weight:700;color:var(--ink-soft)}
+  .tool.plan .step{color:var(--plan)} .tool.budget .step{color:var(--budget)}
+  .tool.day .step{color:var(--day)}
+  .tool h3{font-family:var(--font-disp);font-size:18px;margin:1px 0 0}
+  .tool .desc{font-size:13px;color:var(--ink-soft);margin:12px 0 0}
+  .tool .go{position:absolute;right:20px;top:50%;transform:translateY(-50%);
+    color:var(--line-strong);font-size:20px;transition:color .12s, transform .12s}
+  a.tool:hover .go{color:var(--accent);transform:translateY(-50%) translateX(3px)}
+
+  .flow{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 0 20px;
+    font-size:12px;color:var(--ink-soft);flex-wrap:wrap}
+  .flow b{color:var(--ink);font-weight:700}
+  .flow [data-lucide]{color:var(--line-strong);font-size:14px}
+
+  footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);
+    text-align:center;color:var(--ink-soft);font-size:12px}
+  .comingsoon{display:inline-flex;align-items:center;gap:6px;background:#f3f6f8;
+    border:1px dashed var(--line-strong);border-radius:999px;padding:6px 16px;font-size:12px;
+    color:var(--ink-soft);margin-bottom:14px}
+  @media(max-width:520px){
+    .wrap{padding:20px 14px 70px}
+    .tool .go{display:none}
+    a.tool{padding:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">MOKEI EVENT TOOLKIT</div>
+    <h1>模型イベント運営ツールキット</h1>
+    <p>模型展示会をひらく人のための、無料の運営ツール集。企画から当日まで、主催の各段階をサポートします。</p>
+  </header>
+
+  <section class="intro">
+    <p>模型展示会を主催してきた経験から生まれた、実務で使えるツールをまとめました。</p>
+    <p>「何から考えればいいか分からない」「赤字にならないか不安」「当日の交流をどう生むか」——主催者がつまずきやすいところを、ひとつずつ形にしています。すべてブラウザだけで完結し、登録も費用もいりません。</p>
+  </section>
+
+  <div class="sec-label">ツール一覧</div>
+  <div class="flow">
+    <b>企画</b><i data-lucide="arrow-right"></i><b>予算</b><i data-lucide="arrow-right"></i><b>当日</b>
+    <span>——主催の流れに沿って並べています</span>
+  </div>
+
+  <div class="tools">
+    <a class="tool plan" href="concept.html">
+      <div class="top">
+        <div class="badge"><i data-lucide="lightbulb"></i></div>
+        <div>
+          <div class="step">STEP 1 ・ 企画</div>
+          <h3>コンセプト設計ツール</h3>
+        </div>
+      </div>
+      <p class="desc">「どんなイベントにしたいか」を、6つの観点と2つの軸で整理。企画意図を言葉にし、要件定義・コンセプト骨子まで自動で組み立てます。ステークホルダーへの共有にも。</p>
+      <span class="go"><i data-lucide="arrow-right"></i></span>
+    </a>
+
+    <a class="tool budget" href="budget.html">
+      <div class="top">
+        <div class="badge"><i data-lucide="calculator"></i></div>
+        <div>
+          <div class="step">STEP 2 ・ 予算</div>
+          <h3>収支シミュレーター</h3>
+        </div>
+      </div>
+      <p class="desc">黒字で終わるか、その場で確認。出展料・入場料・協賛から収支を計算し、赤字なら黒字化の道を具体額で提示。会場・印刷・備品の見積例やExcel書き出しも。</p>
+      <span class="go"><i data-lucide="arrow-right"></i></span>
+    </a>
+
+    <a class="tool day" href="cards.html">
+      <div class="top">
+        <div class="badge"><i data-lucide="printer"></i></div>
+        <div>
+          <div class="step">STEP 3 ・ 当日</div>
+          <h3>技法札 印刷ツール</h3>
+        </div>
+      </div>
+      <p class="desc">来場者が話しかけるきっかけに。作者の得意技法や「話しかけOK」を示す卓上札を、選んで印刷するだけ。初対面でも会話が生まれる仕掛けをつくります。</p>
+      <span class="go"><i data-lucide="arrow-right"></i></span>
+    </a>
+
+    <a class="tool day" href="workcard.html">
+      <div class="top">
+        <div class="badge"><i data-lucide="tag"></i></div>
+        <div>
+          <div class="step">STEP 3 ・ 当日</div>
+          <h3>作品カードジェネレーター</h3>
+        </div>
+      </div>
+      <p class="desc">展示作品に添える名刺サイズの説明カード。使う項目を選んで空欄カードを印刷し、当日作者が手書きで記入。作品名・こだわりなどが伝わり、会話のきっかけにもなります。</p>
+      <span class="go"><i data-lucide="arrow-right"></i></span>
+    </a>
+
+    <a class="tool sponsor" href="sponsor.html">
+      <div class="top">
+        <div class="badge"><i data-lucide="handshake"></i></div>
+        <div>
+          <div class="step">協賛・資金</div>
+          <h3>協賛提案書ジェネレーター</h3>
+        </div>
+      </div>
+      <p class="desc">協賛のお願いを、企業に伝わる提案書に。イベント情報と松竹梅プランを入れるだけで、見返り一覧つきの提案書ができます。印刷・PDFでそのまま渡せます。</p>
+      <span class="go"><i data-lucide="arrow-right"></i></span>
+    </a>
+  </div>
+
+  <footer>
+    <div class="comingsoon"><i data-lucide="sparkles"></i> 企画・運営の個別相談は準備中です</div>
+    <div>模型イベント運営ツールキット</div>
+    <div style="margin-top:4px">すべてブラウザ内で動作・データは端末内のみ・サーバー送信なし</div>
+  </footer>
+</div>
+
+<script>
+/* Lucide icons (ISC License) - Copyright (c) Lucide Contributors. https://lucide.dev/license */
+const ICONS={
+  "lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\" /> <path d=\"M9 18h6\" /> <path d=\"M10 22h4\" />",
+  "calculator":"<rect width=\"16\" height=\"20\" x=\"4\" y=\"2\" rx=\"2\" /> <line x1=\"8\" x2=\"16\" y1=\"6\" y2=\"6\" /> <line x1=\"16\" x2=\"16\" y1=\"14\" y2=\"18\" /> <path d=\"M16 10h.01\" /> <path d=\"M12 10h.01\" /> <path d=\"M8 10h.01\" /> <path d=\"M12 14h.01\" /> <path d=\"M8 14h.01\" /> <path d=\"M12 18h.01\" /> <path d=\"M8 18h.01\" />",
+  "printer":"<path d=\"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2\" /> <path d=\"M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6\" /> <rect x=\"6\" y=\"14\" width=\"12\" height=\"8\" rx=\"1\" />",
+  "arrow-right":"<path d=\"M5 12h14\" /> <path d=\"m12 5 7 7-7 7\" />",
+  "handshake":"<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />",
+  "tag":"<path d=\"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z\" /> <circle cx=\"7.5\" cy=\"7.5\" r=\".5\" fill=\"currentColor\" />",
+  "sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />",
+};
+function svg(name){const i=ICONS[name];if(!i)return"";
+  return `<svg class="lucide lucide-${name}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg>`;}
+document.querySelectorAll('[data-lucide]').forEach(el=>{
+  const n=el.getAttribute('data-lucide');if(!ICONS[n])return;el.outerHTML=svg(n);});
+</script>
+</body>
+</html>

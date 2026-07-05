@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<!--
+  模型展示会コンセプト設計ツール
+  アイコン: Lucide (https://lucide.dev) - ISC License
+  Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT).
+  All other copyright (c) for Lucide are held by Lucide Contributors 2022.
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型展示会コンセプト設計ツール</title>
+<style>
+  /* ===== デザイントークン =====
+     ブリーフ：模型展示会の主催者が「企画意図を構造化して、設計の合致をチェックする」ツール。
+     方向性：作業台 × ブループリント。模型の設計図・方眼・製図のニュアンスを下敷きにし、
+     温かみのある紙色ではなく「製図台のグレーブルー」を基調に、朱色を1点アクセントに使う。 */
+  :root{
+    --ink:#1d2530;          /* 主テキスト：濃紺グレー */
+    --ink-soft:#5a6675;     /* 補助テキスト */
+    --line:#c9d2dc;         /* 罫線・方眼 */
+    --line-strong:#9aa7b5;
+    --paper:#eef2f6;        /* 背景：製図台のグレーブルー */
+    --card:#ffffff;
+    --accent:#c8472e;       /* 朱色アクセント（1点のみ） */
+    --accent-soft:#f6e3de;
+    --must:#c8472e;
+    --should:#2f6f8f;
+    --could:#7a8794;
+    --mustnot:#8a8f96;
+    --ok:#2e7d57;
+    --warn:#b8862b;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
+    --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
+    --font-body:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  /* Lucideアイコン共通：line-height内で文字とベースラインを揃える */
+  [data-lucide]{width:1em;height:1em;vertical-align:-.14em;stroke-width:2}
+  svg.lucide{width:1em;height:1em;vertical-align:-.14em}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;font-family:var(--font-body);color:var(--ink);
+    background:var(--paper);
+    line-height:1.7;font-size:15px;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:24px 18px 80px}
+  header.top{padding:18px 0 8px;border-bottom:2px solid var(--ink)}
+  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
+  h1{font-family:var(--font-disp);font-size:26px;margin:6px 0 4px;letter-spacing:.02em}
+  .sub{color:var(--ink-soft);font-size:13px;margin:0}
+
+  /* ステップ進行 */
+  .steps{display:flex;gap:6px;margin:18px 0 22px;flex-wrap:wrap}
+  .steps .s{flex:1;min-width:110px;font-size:11px;color:var(--ink-soft);
+    border-top:3px solid var(--line);padding:6px 2px 0;letter-spacing:.02em}
+  .steps .s.active{color:var(--ink);border-top-color:var(--accent);font-weight:700}
+  .steps .s.done{border-top-color:var(--should)}
+  .steps .s .n{font-size:15px;margin-right:5px;color:var(--line-strong)}
+  .steps .s.active .n{color:var(--accent)}
+  .steps .s.done .n{color:var(--should)}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 20px;margin-bottom:18px}
+  .panel h2{font-family:var(--font-disp);font-size:19px;margin:0 0 4px}
+  .panel .lead{color:var(--ink-soft);font-size:13px;margin:0 0 18px}
+  .hidden{display:none}
+
+  label.q{display:block;font-weight:700;font-size:14px;margin:18px 0 8px}
+  label.q .hint{display:block;font-weight:400;color:var(--ink-soft);font-size:12px;margin-top:2px}
+
+  /* チップ */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line-strong);background:#fff;color:var(--ink);
+    border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;user-select:none;
+    transition:all .12s;display:inline-flex;align-items:center;gap:6px}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* スライダー */
+  .slider-row{margin:16px 0}
+  .slider-row .topline{display:flex;justify-content:space-between;align-items:baseline;font-size:13px}
+  .slider-row .topline b{font-size:14px}
+  .slider-row .topline .val{font-family:var(--font-disp);color:var(--accent);font-size:15px}
+  .slider-row .ends{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);margin-top:2px}
+  input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0 0}
+
+  /* 2D配置マップ */
+  .map-wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+  .map{position:relative;width:280px;height:280px;border:1px solid var(--line-strong);
+    background:
+      linear-gradient(var(--line) 1px,transparent 1px) 0 0/100% 20px,
+      linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/20px 100%,
+      #fff;
+    border-radius:8px;touch-action:none;flex:0 0 auto}
+  .map .axisx,.map .axisy{position:absolute;background:var(--line-strong)}
+  .map .axisx{left:0;right:0;top:50%;height:1px}
+  .map .axisy{top:0;bottom:0;left:50%;width:1px}
+  .map .lbl{position:absolute;font-size:10px;color:var(--ink-soft);letter-spacing:.05em}
+  .map .lbl.t{top:4px;left:50%;transform:translateX(-50%)}
+  .map .lbl.b{bottom:4px;left:50%;transform:translateX(-50%)}
+  .map .lbl.l{left:4px;top:50%;transform:translateY(-50%)}
+  .map .lbl.r{right:4px;top:50%;transform:translateY(-50%)}
+  .map .dot{position:absolute;width:22px;height:22px;border-radius:50%;
+    background:var(--accent);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transform:translate(-50%,-50%);cursor:grab}
+  .map .dot:active{cursor:grabbing}
+  .map-read{font-size:12px;color:var(--ink-soft);flex:1;min-width:180px}
+  .map-read b{color:var(--ink)}
+
+  /* ボタン */
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:8px}
+  button.btn{font-family:var(--font-body);font-size:14px;font-weight:700;
+    border-radius:8px;padding:11px 20px;cursor:pointer;border:1px solid var(--ink);
+    background:var(--ink);color:#fff;transition:opacity .12s;
+    display:inline-flex;align-items:center;gap:7px}
+  button.btn:hover{opacity:.88}
+  button.btn.ghost{background:#fff;color:var(--ink)}
+  button.btn.accent{background:var(--accent);border-color:var(--accent)}
+  button.btn:disabled{opacity:.4;cursor:not-allowed}
+
+  /* テキスト入力 */
+  input[type=text]{width:100%;font-family:var(--font-body);font-size:14px;
+    padding:10px 12px;border:1px solid var(--line-strong);border-radius:8px;margin-top:6px}
+  input[type=text]:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+
+  /* 結果 */
+  .result-block{margin:0 0 22px}
+  .result-block h3{font-family:var(--font-disp);font-size:16px;margin:0 0 10px;
+    padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .result-block h3 [data-lucide],.result-block h3 svg{color:var(--accent)}
+  .tips-h [data-lucide],.tips-h svg{color:var(--warn)}
+  .req{border-left:4px solid var(--line-strong);padding:8px 12px;margin:8px 0;background:#fafbfc;font-size:14px}
+  .req .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;
+    padding:2px 8px;border-radius:4px;color:#fff;margin-right:8px;vertical-align:1px}
+  .req.must{border-color:var(--must)} .req.must .tag{background:var(--must)}
+  .req.should{border-color:var(--should)} .req.should .tag{background:var(--should)}
+  .req.could{border-color:var(--could)} .req.could .tag{background:var(--could)}
+  .req.mustnot{border-color:var(--mustnot)} .req.mustnot .tag{background:var(--mustnot)}
+  .tips{margin:10px 0 2px;padding:8px 0 0;border-top:1px dashed var(--line)}
+  .tips-h{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:4px}
+  .tips ul{margin:0;padding-left:18px}
+  .tips li{font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin:1px 0}
+
+  .check{padding:9px 12px;margin:7px 0;border-radius:8px;font-size:13px;display:flex;gap:8px}
+  .check .ico{flex:0 0 auto;font-weight:700}
+  .check.ok{background:#eaf5ef;color:#1f5e42}
+  .check.ok .ico{color:var(--ok)}
+  .check.warn{background:#fbf3e2;color:#7a5a16}
+  .check.warn .ico{color:var(--warn)}
+
+  .concept{background:var(--accent-soft);border:1px solid #e7c4bb;border-radius:8px;
+    padding:16px 16px;font-size:15px;line-height:1.9}
+
+  .note{font-size:12px;color:var(--ink-soft);background:#f3f6f8;border:1px dashed var(--line-strong);
+    border-radius:8px;padding:10px 12px;margin:10px 0}
+
+  /* コピー欄 */
+  textarea{width:100%;min-height:160px;font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:12px;padding:12px;border:1px solid var(--line-strong);border-radius:8px;resize:vertical}
+  .copy-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;
+    opacity:0;transition:all .25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:11px;margin-top:30px}
+  @media(max-width:520px){
+    .wrap{padding:16px 12px 70px}
+    h1{font-size:22px}
+    .map{width:240px;height:240px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">EXHIBITION CONCEPT BUILDER</div>
+    <h1>模型展示会コンセプト設計ツール</h1>
+    <p class="sub">企画意図を構造化し、設計の合致を確かめる。模型展示会の主催者のための叩き台メーカー。</p>
+  </header>
+
+  <div class="steps" id="steps">
+    <div class="s" data-s="0"><span class="n"><i data-lucide="layers"></i></span>ジャンル</div>
+    <div class="s" data-s="1"><span class="n"><i data-lucide="map"></i></span>性格（2軸）</div>
+    <div class="s" data-s="2"><span class="n"><i data-lucide="sliders-horizontal"></i></span>重視点（6軸）</div>
+    <div class="s" data-s="3"><span class="n"><i data-lucide="clipboard-check"></i></span>結果</div>
+    <div class="s" data-s="4"><span class="n"><i data-lucide="share-2"></i></span>共有</div>
+  </div>
+
+  <!-- STEP 0: ジャンル -->
+  <section class="panel" data-step="0">
+    <h2>展示ジャンルの方向性</h2>
+    <p class="lead">どこまでの作品を受け入れる場にしますか。間口の広さが、この先のすべてに効いてきます。</p>
+    <div class="chips" id="genreChips">
+      <span class="chip" data-v="all"><i data-lucide="layers"></i>模型オールジャンル</span>
+      <span class="chip" data-v="sub"><i data-lucide="shapes"></i>模型以外のジャンルもOK</span>
+      <span class="chip" data-v="limited"><i data-lucide="target"></i>特定の模型ジャンル・テーマに限定</span>
+    </div>
+    <div id="genreThemeWrap" class="hidden">
+      <label class="q">限定するテーマ
+        <span class="hint">例：旧日本軍機のみ／カーモデル限定／三河の風景ジオラマ など</span>
+      </label>
+      <input type="text" id="genreTheme" placeholder="絞り込むテーマを入力">
+    </div>
+    <div class="nav"><span></span><button class="btn" onclick="next()">次へ<i data-lucide="arrow-right"></i></button></div>
+  </section>
+
+  <!-- STEP 1: 2軸 -->
+  <section class="panel hidden" data-step="1">
+    <h2>イベントの性格</h2>
+    <p class="lead">点をドラッグして、目指すイベントの立ち位置を決めてください。</p>
+    <div class="map-wrap">
+      <div class="map" id="map">
+        <div class="axisx"></div><div class="axisy"></div>
+        <div class="lbl t"><i data-lucide="door-open"></i> オープン（誰でも）</div>
+        <div class="lbl b"><i data-lucide="lock"></i> クローズド（限られた）</div>
+        <div class="lbl l"><i data-lucide="image"></i><br>展示<br>重視</div>
+        <div class="lbl r"><i data-lucide="messages-square"></i><br>交流<br>重視</div>
+        <div class="dot" id="dot"></div>
+      </div>
+      <div class="map-read" id="mapRead"></div>
+    </div>
+    <div class="nav"><button class="btn ghost" onclick="prev()"><i data-lucide="arrow-left"></i>戻る</button><button class="btn" onclick="next()">次へ<i data-lucide="arrow-right"></i></button></div>
+  </section>
+
+  <!-- STEP 2: 6軸 -->
+  <section class="panel hidden" data-step="2">
+    <h2>何を重視しますか</h2>
+    <p class="lead">6つの観点に重み付けをします。相対的な順位で要件の強さが決まるので、メリハリをつけてください。</p>
+    <div id="sliders"></div>
+    <div class="nav"><button class="btn ghost" onclick="prev()"><i data-lucide="arrow-left"></i>戻る</button><button class="btn accent" onclick="generate();next()"><i data-lucide="sparkles"></i>結果を見る</button></div>
+  </section>
+
+  <!-- STEP 3: 結果 -->
+  <section class="panel hidden" data-step="3">
+    <h2>設計の叩き台</h2>
+    <p class="lead">入力から自動で組み立てた結果です。完成品ではなく、考えるための出発点として使ってください。</p>
+    <div id="results"></div>
+    <div class="nav"><button class="btn ghost" onclick="prev()"><i data-lucide="arrow-left"></i>戻る</button><button class="btn" onclick="next()">共有・保存へ<i data-lucide="arrow-right"></i></button></div>
+  </section>
+
+  <!-- STEP 4: 共有 -->
+  <section class="panel hidden" data-step="4">
+    <h2>共有・保存</h2>
+    <p class="lead">結果をテキストでコピーするか、入力内容を保存して後で読み込めます。</p>
+
+    <label class="q">① 結果テキスト（ステークホルダー共有用）</label>
+    <textarea id="exportText" readonly></textarea>
+    <div class="copy-row">
+      <button class="btn" onclick="copyText('exportText')"><i data-lucide="copy"></i>結果をコピー</button>
+    </div>
+
+    <label class="q" style="margin-top:22px">② キャッチコピーを磨く（任意）
+      <span class="hint">このプロンプトをコピーして、Claude等のAIに貼ると候補を出せます。ルールベースでは出せない"刺さる言葉"はここで。</span>
+    </label>
+    <textarea id="copyPrompt" readonly></textarea>
+    <div class="copy-row">
+      <button class="btn" onclick="copyText('copyPrompt')"><i data-lucide="copy"></i>プロンプトをコピー</button>
+    </div>
+
+    <label class="q" style="margin-top:22px">③ 入力内容の保存（JSON）
+      <span class="hint">この文字列をメモに残しておけば、下の欄に貼って復元できます。</span>
+    </label>
+    <textarea id="saveJson" readonly></textarea>
+    <div class="copy-row">
+      <button class="btn" onclick="copyText('saveJson')"><i data-lucide="save"></i>保存データをコピー</button>
+    </div>
+
+    <label class="q" style="margin-top:22px">④ 入力内容の読み込み</label>
+    <textarea id="loadJson" placeholder="保存したJSONをここに貼って『読み込む』を押す"></textarea>
+    <div class="copy-row">
+      <button class="btn ghost" onclick="loadFromJson()"><i data-lucide="upload"></i>読み込む</button>
+    </div>
+
+    <div class="nav" style="margin-top:18px"><button class="btn ghost" onclick="prev()"><i data-lucide="arrow-left"></i>戻る</button><span></span></div>
+  </section>
+
+  <footer>ルールベースで動作・データは端末内のみ・サーバー送信なし</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* Lucide icons (ISC License) - Copyright (c) Lucide Contributors. https://lucide.dev/license */
+const ICONS={
+  "arrow-left":"<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />",
+  "arrow-right":"<path d=\"M5 12h14\" /> <path d=\"m12 5 7 7-7 7\" />",
+  "clipboard-check":"<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\" /> <path d=\"m9 14 2 2 4-4\" />",
+  "copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />",
+  "door-open":"<path d=\"M11 20H2\" /> <path d=\"M11 4.562v16.157a1 1 0 0 0 1.242.97L19 20V5.562a2 2 0 0 0-1.515-1.94l-4-1A2 2 0 0 0 11 4.561z\" /> <path d=\"M11 4H8a2 2 0 0 0-2 2v14\" /> <path d=\"M14 12h.01\" /> <path d=\"M22 20h-3\" />",
+  "file-text":"<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M10 9H8\" /> <path d=\"M16 13H8\" /> <path d=\"M16 17H8\" />",
+  "image":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />",
+  "layers":"<path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\" /> <path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\" /> <path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\" />",
+  "lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\" /> <path d=\"M9 18h6\" /> <path d=\"M10 22h4\" />",
+  "list-checks":"<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />",
+  "lock":"<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\" /> <path d=\"M7 11V7a5 5 0 0 1 10 0v4\" />",
+  "map":"<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />",
+  "messages-square":"<path d=\"M16 10a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 14.286V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z\" /> <path d=\"M20 9a2 2 0 0 1 2 2v10.286a.71.71 0 0 1-1.212.502l-2.202-2.202A2 2 0 0 0 17.172 19H10a2 2 0 0 1-2-2v-1\" />",
+  "save":"<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />",
+  "shapes":"<path d=\"M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z\" /> <rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\" /> <circle cx=\"17.5\" cy=\"17.5\" r=\"3.5\" />",
+  "share-2":"<circle cx=\"18\" cy=\"5\" r=\"3\" /> <circle cx=\"6\" cy=\"12\" r=\"3\" /> <circle cx=\"18\" cy=\"19\" r=\"3\" /> <line x1=\"8.59\" x2=\"15.42\" y1=\"13.51\" y2=\"17.49\" /> <line x1=\"15.41\" x2=\"8.59\" y1=\"6.51\" y2=\"10.49\" />",
+  "shield-check":"<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"m9 12 2 2 4-4\" />",
+  "sliders-horizontal":"<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />",
+  "sparkles":"<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />",
+  "target":"<circle cx=\"12\" cy=\"12\" r=\"10\" /> <circle cx=\"12\" cy=\"12\" r=\"6\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" />",
+  "upload":"<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />",
+  "trophy":"<path d=\"M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978\" /> <path d=\"M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978\" /> <path d=\"M18 9h1.5a1 1 0 0 0 0-5H18\" /> <path d=\"M4 22h16\" /> <path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\" /> <path d=\"M6 9H4.5a1 1 0 0 1 0-5H6\" />",
+  "graduation-cap":"<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />",
+  "map-pin":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />",
+  "sprout":"<path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\" /> <path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\" /> <path d=\"M5 21h14\" />",
+  "circle-check":"<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m9 12 2 2 4-4\" />",
+  "triangle-alert":"<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />",
+};
+/* ============ 状態 ============ */
+const AXES = [
+  {key:"display",  label:"展示クオリティ",   icon:"image"},
+  {key:"social",   label:"参加者交流",       icon:"messages-square"},
+  {key:"compete",  label:"競争性",           icon:"trophy"},
+  {key:"learn",    label:"学び",             icon:"graduation-cap"},
+  {key:"region",   label:"地域性/地域連携",  icon:"map-pin"},
+  {key:"beginner", label:"初心者親和性",     icon:"sprout"},
+];
+const state = {
+  genre:null, genreTheme:"",
+  mx:50, my:50,              // 横軸=展示↔交流(0左展示/100右交流), 縦軸=オープン↔クローズド(0上オープン/100下クローズド)
+  axis:{display:50,social:50,compete:50,learn:50,region:50,beginner:50},
+};
+let step=0;
+
+/* ============ 24パターン定型文（軸×ランク） ============ */
+const REQ_TEXT = {
+  display:{
+    must:"展示の見せ方・什器・照明にこだわり、作品が主役の空間を必ず作る",
+    should:"展示の見栄えをできる限り高める工夫を入れる",
+    could:"余力があれば展示演出を強化する",
+    mustnot:"展示の作り込みは重視せず、手軽さを優先する"},
+  social:{
+    must:"参加者同士が自然に話せる仕掛けを必ず用意する",
+    should:"交流のきっかけをできる限り設ける",
+    could:"余力があれば交流の場を設ける",
+    mustnot:"交流の演出は最小限にし、各自のペースを尊重する"},
+  compete:{
+    must:"順位・表彰・コンペ要素を中核に据える",
+    should:"コンテスト的要素をできる限り取り入れる",
+    could:"余力があれば投票・表彰を設ける",
+    mustnot:"順位づけ・コンペ要素はあえて入れない"},
+  learn:{
+    must:"技法共有・トーク等、学べる機会を必ず用意する",
+    should:"学びの要素をできる限り盛り込む",
+    could:"余力があれば知見共有の場を設ける",
+    mustnot:"教える／学ぶ要素は前面に出さない"},
+  region:{
+    must:"その地域ならではの題材・連携を必ず打ち出す",
+    should:"地域色をできる限り演出する",
+    could:"余力があれば地域要素を加える",
+    mustnot:"地域性は前面に出さず、テーマ自体を優先する"},
+  beginner:{
+    must:"初心者が気後れしない導線・声かけ・案内を必ず設ける",
+    should:"初心者への配慮をできる限り入れる",
+    could:"余力があれば初心者向け工夫を加える",
+    mustnot:"初心者向け配慮は最小限とし、コア層に最適化する"},
+};
+const RANK_LABEL={must:"MUST",should:"SHOULD",could:"COULD",mustnot:"MUST NOT"};
+
+/* ============ MUST要件 × 具体的な実施アイデア（参考リスト） ============
+   キー＝MUST要件文。値＝具体策の配列。req-and-spec.md がマスター。 */
+const TIPS = {
+  // 発生源1：6軸
+  "展示の見せ方・什器・照明にこだわり、作品が主役の空間を必ず作る":[
+    "什器を統一する（テーブルクロス・台の高さ・色味を揃える）",
+    "作品にキャプション（作品名・作者名・ひとこと）を付ける",
+    "照明を用意する（スポット・クリップライト等で作品に光を当てる）",
+    "作品間の間隔を確保し、詰め込みすぎない"],
+  "参加者同士が自然に話せる仕掛けを必ず用意する":[
+    "作品横にコメントカード／付箋を置き、来場者が感想を残せるようにする",
+    "「話しかけてOK」「作者在席中」を示す札を各卓に置く",
+    "主催者が会話のきっかけを振る役（声かけ役・橋渡し役）を置く",
+    "共通ハッシュタグを掲示し、名札に「呼ばれたい名前＋ひとこと」欄を作る"],
+  "順位・表彰・コンペ要素を中核に据える":[
+    "審査基準・部門を明示する（テーマ部門／技術部門等）",
+    "審査員を立てる、または来場者投票の仕組みを作る",
+    "投票用紙・投票ボックス／フォームを用意する",
+    "表彰の場・賞品・賞状を準備する"],
+  "技法共有・トーク等、学べる機会を必ず用意する":[
+    "トーク・実演・ワークショップの枠を設ける",
+    "登壇者／講師を確保する",
+    "作品キャプションに「使用技法・工夫した点」欄を足す",
+    "資料・作り方メモの配布／共有（当日・事後）"],
+  "その地域ならではの題材・連携を必ず打ち出す":[
+    "地域にちなんだテーマ・部門を設定する",
+    "地元店舗・施設・団体と連携する（会場・協賛・物販）",
+    "地元メディア・自治体に告知協力を依頼する",
+    "地域モチーフのジオラマ・作品を呼びかける"],
+  "初心者が気後れしない導線・声かけ・案内を必ず設ける":[
+    "当日参加枠を確保する（事前申込なしでも参加できる）",
+    "途中参加・途中撤収を許容する（フル拘束しない）",
+    "作品クオリティの制約を課さない（完成度を問わない／WIP・未完成歓迎）",
+    "「初心者歓迎」を告知に明記する",
+    "初参加者向けの案内（受付での説明・パンフ）を用意する",
+    "質問・相談できる窓口（声かけ役）を置く"],
+  // 発生源2：ジャンル
+  "ジャンルを問わず受け入れ、多様な作品が並ぶ間口の広さを担保する":[
+    "募集要項に「ジャンル不問」を明記する",
+    "受け入れ範囲（模型の定義・サイズ上限等）の最低ラインだけ決める",
+    "多様なジャンルが混在しても見やすい展示レイアウトを設計する",
+    "ジャンル別にゆるくゾーニングする（探しやすさの確保）",
+    "「何を出していいか分からない人」向けの参加例を示す"],
+  "模型に限らず他ジャンルの作品も歓迎し表現の幅を広げる。一方で全体の統一感を別途設計する":[
+    "受け入れる「模型以外」の範囲を具体的に定義・明示する",
+    "全体の世界観・トーンを統一する仕掛け（テーマ・装飾）を用意する",
+    "模型と他ジャンルの展示エリアの配置バランスを設計する",
+    "異ジャンル間で来場者が回遊できる導線を作る",
+    "募集時に「なぜ他ジャンルもOKか」の意図を伝える"],
+  // 発生源3：縦軸
+  "初参加・見学だけの来場も歓迎し、参加条件を極力設けない":[
+    "「見学のみOK」「初参加歓迎」を告知に明記する",
+    "入場無料／予約不要など参加ハードルを下げる",
+    "当日飛び入り参加の可否と方法を決めておく"],
+  "会場は、一般の方も立ち寄りやすいオープンな場を選ぶ":[
+    "人通りのある立地／公共施設・商業施設等を候補にする",
+    "入口を入りやすくする（開放感・看板・声かけ）",
+    "バリアフリー・アクセスのしやすさを確認する"],
+  "告知は、複数のSNSで行い、チラシの配布・開催地周辺の店舗掲示等を行う":[
+    "複数SNS（X・Instagram等）で告知する",
+    "チラシを作成し、関連店舗・施設に掲示依頼する",
+    "開催地周辺の模型店・カフェ等への掲示を打診する"],
+  "基本は誰でも参加可とし、緩やかなテーマ・対象を示す":[
+    "「どんな人に来てほしいか」を緩やかに言語化して示す",
+    "参加の最低条件（あれば）だけを明示する",
+    "厳しすぎない申込方法を用意する"],
+  "告知は、複数のSNSで行う":[
+    "複数SNS（X・Instagram等）で告知する",
+    "告知のタイミング（初告知・リマインド）を計画する",
+    "参加者によるシェアを促す（ハッシュタグ等）"],
+  "対象を一定の層に絞り、参加には簡単な条件・申込を設ける":[
+    "対象とする層（経験・ジャンル・地域等）を定義する",
+    "簡単な申込フォーム・事前エントリーを用意する",
+    "募集をかける範囲（コミュニティ・知人経由等）を決める",
+    "参加条件を満たすかの確認方法を決めておく"],
+  "参加者を限定し、招待・選考・コミュニティ内に閉じた運営とする":[
+    "招待制／選考制のいずれかと、その基準を決める",
+    "参加者リスト・声かけ範囲を管理する",
+    "非公開での連絡・運営手段（クローズドな場）を用意する",
+    "限定する理由を参加者に共有し、納得感を持たせる"],
+};
+/* 限定ジャンルは要件文にテーマが差し込まれるため、前方一致で引く */
+const TIPS_LIMITED = [
+  "対象テーマの定義・範囲を具体的に明文化する",
+  "「範囲外」と判断される例を募集要項に明示する",
+  "範囲外作品の扱い（展示可否・別枠等）を事前に決める",
+  "テーマに沿った会場装飾・演出で専門性を打ち出す",
+  "テーマ特化ならではの深掘り企画（トーク・特集展示）を検討する"];
+function tipsFor(text){
+  if(TIPS[text]) return TIPS[text];
+  if(text.indexOf("に対象を絞り、テーマの一貫性")>=0) return TIPS_LIMITED; // 限定ジャンル
+  return null;
+}
+
+/* ============ 初期化：チップ・スライダー・マップ ============ */
+function initGenre(){
+  document.querySelectorAll('#genreChips .chip').forEach(c=>{
+    c.onclick=()=>{
+      document.querySelectorAll('#genreChips .chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on'); state.genre=c.dataset.v;
+      document.getElementById('genreThemeWrap').classList.toggle('hidden', c.dataset.v!=='limited');
+    };
+  });
+  document.getElementById('genreTheme').oninput=e=>state.genreTheme=e.target.value;
+}
+function initSliders(){
+  const wrap=document.getElementById('sliders');
+  wrap.innerHTML=AXES.map(a=>`
+    <div class="slider-row">
+      <div class="topline"><b><i data-lucide="${a.icon}"></i> ${a.label}</b><span class="val" id="v_${a.key}">50</span></div>
+      <input type="range" min="0" max="100" value="50" id="s_${a.key}">
+      <div class="ends"><span>重視しない</span><span>最重視</span></div>
+    </div>`).join('');
+  AXES.forEach(a=>{
+    const s=document.getElementById('s_'+a.key);
+    s.oninput=()=>{state.axis[a.key]=+s.value;document.getElementById('v_'+a.key).textContent=s.value;};
+  });
+}
+function initMap(){
+  const map=document.getElementById('map'), dot=document.getElementById('dot');
+  function place(){dot.style.left=state.mx+'%';dot.style.top=state.my+'%';readMap();}
+  function setFrom(e){
+    const r=map.getBoundingClientRect();
+    const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    state.mx=Math.max(0,Math.min(100,Math.round(cx/r.width*100)));
+    state.my=Math.max(0,Math.min(100,Math.round(cy/r.height*100)));
+    place();
+  }
+  let drag=false;
+  const start=e=>{drag=true;setFrom(e);e.preventDefault();};
+  const move=e=>{if(drag)setFrom(e);};
+  const end=()=>drag=false;
+  map.addEventListener('mousedown',start);window.addEventListener('mousemove',move);window.addEventListener('mouseup',end);
+  map.addEventListener('touchstart',start,{passive:false});map.addEventListener('touchmove',move,{passive:false});window.addEventListener('touchend',end);
+  place();
+}
+function readMap(){
+  const openCl = state.my; // 0=オープン,100=クローズド
+  const dispSoc = state.mx; // 0=展示,100=交流
+  const vert = openCl<=30?"強くオープン":openCl<=55?"ややオープン":openCl<=80?"ややクローズド":"強くクローズド";
+  const horz = dispSoc<=30?"展示中心":dispSoc<=45?"やや展示寄り":dispSoc<=55?"展示と交流の中間":dispSoc<=70?"やや交流寄り":"交流中心";
+  document.getElementById('mapRead').innerHTML=
+    `縦軸：<b>${vert}</b>（${100-openCl}％オープン）<br>横軸：<b>${horz}</b><br>
+     <span style="font-size:11px">縦軸は参加のハードルと規模感、横軸はイベントの基本性格を表します。</span>`;
+}
+
+/* ============ 振り分けロジック（相対順位＋極端値補正） ============ */
+function classify(){
+  // 値で降順ソート
+  const sorted=[...AXES].map(a=>({key:a.key,label:a.label,v:state.axis[a.key]}))
+                        .sort((p,q)=>q.v-p.v);
+  const rankOf={};
+  sorted.forEach((it,i)=>{
+    let r;
+    if(i<=1) r="must"; else if(i<=3) r="should"; else if(i===4) r="could"; else r="mustnot";
+    // 僅差補正：直前と差5以内なら直前と同ランクに寄せる
+    if(i>0 && (sorted[i-1].v-it.v)<=5) r=rankOf[sorted[i-1].key];
+    rankOf[it.key]=r;
+  });
+  // 極端値の上書き
+  AXES.forEach(a=>{
+    const v=state.axis[a.key];
+    if(v>=85) rankOf[a.key]="must";
+    else if(v<20) rankOf[a.key]="mustnot";
+  });
+  return {sorted,rankOf};
+}
+
+/* ============ 相互作用ルール（矛盾検知・サジェスト） ============ */
+function interactions(rankOf){
+  const out=[]; const ax=state.axis;
+  const openCl=state.my, dispSoc=state.mx;
+  // 横軸 × 6軸の整合チェック（ダブルチェック）
+  if(dispSoc>=70 && ax.social<55)
+    out.push(["warn","基本方針は交流寄りですが、参加者交流の重み付けが低めです。方針と重みを揃えるか、意図を明確に。"]);
+  else if(dispSoc<=30 && ax.display<55)
+    out.push(["warn","基本方針は展示中心ですが、展示クオリティの重み付けが低めです。整合させることを検討してください。"]);
+  else if((dispSoc>=70 && ax.social>=70)||(dispSoc<=30 && ax.display>=70))
+    out.push(["ok","イベントの基本方針と重み付けが整合しています。"]);
+  // 縦軸 × 初心者
+  if(openCl>=81 && ax.beginner>=70)
+    out.push(["warn","閉じた運営と初心者歓迎は両立しにくいです。『コミュニティ内の新人向け』など範囲を明確に。"]);
+  if(openCl<=30 && ax.beginner>=70)
+    out.push(["ok","オープンな間口と初心者配慮は好相性。理想的な組み合わせです。"]);
+  // ジャンル × 軸
+  if(state.genre==="limited" && ax.beginner>=70)
+    out.push(["warn","ジャンルを絞ると初心者の参加ハードルが上がりがち。入門者の受け皿を別途用意すると良いです。"]);
+  if(state.genre==="all" && ax.display>=70)
+    out.push(["warn","間口が広いと作品レベルにばらつきが出やすいです。見せ方の工夫で全体の質感を揃えましょう。"]);
+  if(state.genre==="limited" && openCl<=30)
+    out.push(["warn","間口は広いがジャンルは限定。テーマに関心がある人へ確実に届く告知設計が鍵になります。"]);
+  if(state.genre==="sub" && ax.region>=70)
+    out.push(["ok","模型以外のジャンルの受け入れと地域性は両立可能。全体の統一感だけ別途設計しましょう。"]);
+  if(out.length===0) out.push(["ok","目立った矛盾は検出されませんでした。"]);
+  return out;
+}
+
+/* ============ 縦軸・ジャンルの専用要件文 ============ */
+function openClText(){
+  const v=state.my;
+  if(v<=30) return [
+    {rank:"must",text:"初参加・見学だけの来場も歓迎し、参加条件を極力設けない"},
+    {rank:"must",text:"会場は、一般の方も立ち寄りやすいオープンな場を選ぶ"},
+    {rank:"must",text:"告知は、複数のSNSで行い、チラシの配布・開催地周辺の店舗掲示等を行う"}
+  ];
+  if(v<=55) return [
+    {rank:"must",text:"基本は誰でも参加可とし、緩やかなテーマ・対象を示す"},
+    {rank:"must",text:"告知は、複数のSNSで行う"},
+    {rank:"should",text:"会場は、一般の方も立ち寄りやすいオープンな場を選ぶ"},
+    {rank:"should",text:"告知チラシの配布・開催地周辺の店舗掲示等を行う"}
+  ];
+  if(v<=80) return [{rank:"must",text:"対象を一定の層に絞り、参加には簡単な条件・申込を設ける"}];
+  return [{rank:"must",text:"参加者を限定し、招待・選考・コミュニティ内に閉じた運営とする"}];
+}
+function genreText(){
+  if(state.genre==="all") return "ジャンルを問わず受け入れ、多様な作品が並ぶ間口の広さを担保する";
+  if(state.genre==="sub") return "模型に限らず他ジャンルの作品も歓迎し表現の幅を広げる。一方で全体の統一感を別途設計する";
+  if(state.genre==="limited"){
+    const t=state.genreTheme.trim()||"設定テーマ";
+    return `「${t}」に対象を絞り、テーマの一貫性と専門性を前面に出す。範囲外作品の扱いを明示する`;
+  }
+  return "（ジャンル未選択）";
+}
+
+/* ============ コンセプト骨子の組み立て ============ */
+function buildConcept(rankOf){
+  const ax=state.axis, openCl=state.my, dispSoc=state.mx;
+  // ① 誰のための場か
+  let p1;
+  if(openCl<=30 && ax.beginner>=60) p1="模型を始めたばかりの人も、長く続けている人も、誰もが気軽に参加できる場。";
+  else if(openCl<=30) p1="関心のある人なら誰でも足を運べる、開かれた場。";
+  else if(openCl>=81) p1="特定のテーマに深く関心を持つ人が集まる場。";
+  else p1="一定のテーマを共有する人が集う場。";
+  // ② 何を大切にするか（Must上位2軸）
+  const musts=AXES.filter(a=>rankOf[a.key]==="must").map(a=>a.key);
+  const valueWord={display:"作品をじっくり見せること",social:"参加者同士のつながり",compete:"競い合う楽しさ",
+    learn:"学び合い",region:"その土地ならではの魅力",beginner:"初めての人への気づかい"};
+  let p2;
+  if(musts.length>=2) p2=`${valueWord[musts[0]]}と${valueWord[musts[1]]}を大切にし、`;
+  else if(musts.length===1) p2=`${valueWord[musts[0]]}を何より大切にし、`;
+  else p2="バランスを大切にし、";
+  // ③ どんな雰囲気か（横軸＋ジャンル）
+  let p3;
+  const genreFlavor = state.genre==="all"?"ジャンルの垣根なく":state.genre==="sub"?"模型も他ジャンルも分け隔てなく":
+    state.genre==="limited"?`「${state.genreTheme.trim()||"テーマ"}」を軸に`:"";
+  if(dispSoc>=60) p3=`${genreFlavor}作品を通じて語り合える。`;
+  else if(dispSoc<=40) p3=`${genreFlavor}じっくりと作品に向き合える。`;
+  else p3=`${genreFlavor}見る楽しさと話す楽しさが両立する。`;
+  // ④ あえてやらないこと（Must Not）
+  const mn=AXES.find(a=>rankOf[a.key]==="mustnot");
+  const avoidWord={display:"見栄えの作り込みにこだわるのではなく",social:"無理に交流を促すのではなく",
+    compete:"順位や優劣を競うのではなく",learn:"教える／教わる関係に偏るのではなく",
+    region:"地域色を前面に出すのではなく",beginner:"特定の層だけに最適化するのではなく"};
+  let p4=mn?`${avoidWord[mn.key]}、`:"";
+  // ⑤ 目指す状態
+  let p5="互いの作品を楽しみ認め合う、そんな場を目指す。";
+  if(musts.includes("social")) p5="人と人がつながる、そんな場を目指す。";
+  else if(musts.includes("display")) p5="作品が主役になる、そんな場を目指す。";
+  else if(musts.includes("region")) p5="開催地域ならではの特色を楽しめる、そんな場を目指す。";
+  return p1+p2+p3+p4+p5;
+}
+
+/* ============ 結果生成・描画 ============ */
+let lastResult=null;
+function generate(){
+  const {sorted,rankOf}=classify();
+  // 要件リスト（ランク順に並べる）
+  const order=["must","should","could","mustnot"];
+  const reqs=[];
+  // ジャンル・縦軸の専用要件を先頭に（Must級扱い）
+  reqs.push({rank:"must",text:genreText()});
+  openClText().forEach(o=>reqs.push({rank:o.rank,text:o.text}));
+  AXES.forEach(a=>reqs.push({rank:rankOf[a.key],text:REQ_TEXT[a.key][rankOf[a.key]]}));
+  reqs.sort((p,q)=>order.indexOf(p.rank)-order.indexOf(q.rank));
+  const checks=interactions(rankOf);
+  const concept=buildConcept(rankOf);
+  lastResult={reqs,checks,concept,rankOf};
+  renderResults();
+  buildExports();
+}
+function renderResults(){
+  const {reqs,checks,concept}=lastResult;
+  const el=document.getElementById('results');
+  let html="";
+  html+=`<div class="result-block"><h3><i data-lucide="file-text"></i> コンセプト骨子</h3>
+    <div class="concept">${concept}</div>
+    <div class="note">これは差し込みで組み立てた叩き台です。あなた自身の言葉で磨き、キャッチコピーは次画面のプロンプトでAIに磨かせることもできます。</div></div>`;
+  html+=`<div class="result-block"><h3><i data-lucide="list-checks"></i> 要件定義</h3>`;
+  reqs.forEach(r=>{
+    html+=`<div class="req ${r.rank}"><span class="tag">${RANK_LABEL[r.rank]}</span>${r.text}`;
+    const tips = r.rank==="must" ? tipsFor(r.text) : null;
+    if(tips){
+      html+=`<div class="tips"><div class="tips-h"><i data-lucide="lightbulb"></i> 実施アイデア（参考）</div><ul>`;
+      tips.forEach(t=>html+=`<li>${t}</li>`);
+      html+=`</ul></div>`;
+    }
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  html+=`<div class="result-block"><h3><i data-lucide="shield-check"></i> 設計の合致チェック</h3>`;
+  checks.forEach(c=>{
+    html+=`<div class="check ${c[0]}"><span class="ico"><i data-lucide="${c[0]==='ok'?'circle-check':'triangle-alert'}"></i></span><span>${c[1]}</span></div>`;
+  });
+  html+=`</div>`;
+  el.innerHTML=html;
+  refreshIcons();
+}
+
+/* ============ 書き出し（テキスト・プロンプト・JSON） ============ */
+function buildExports(){
+  const {reqs,checks,concept}=lastResult;
+  // 結果テキスト
+  let t="【展示会コンセプト設計】\n\n■コンセプト骨子\n"+concept+"\n\n■要件定義\n";
+  reqs.forEach(r=>{
+    t+=`[${RANK_LABEL[r.rank]}] ${r.text}\n`;
+    const tips = r.rank==="must" ? tipsFor(r.text) : null;
+    if(tips) tips.forEach(tp=>t+=`    - ${tp}\n`);
+  });
+  t+="\n■合致チェック\n";
+  checks.forEach(c=>t+=`${c[0]==='ok'?'OK':'!!'} ${c[1]}\n`);
+  document.getElementById('exportText').value=t;
+  // キャッチコピー用プロンプト
+  const musts=reqs.filter(r=>r.rank==="must").map(r=>r.text).join("／");
+  const prompt=
+`あなたはコピーライターです。下記の模型展示会のコンセプトに合う、印象に残るキャッチコピーを5案、それぞれ一言の狙い付きで提案してください。短く、参加したくなる言葉で。
+
+コンセプト：${concept}
+特に外せない要素：${musts}
+
+出力形式：
+1. 〔コピー〕— 狙い
+（5案）`;
+  document.getElementById('copyPrompt').value=prompt;
+  // 保存JSON
+  document.getElementById('saveJson').value=JSON.stringify(state);
+}
+
+/* ============ 保存・読込・コピー ============ */
+function loadFromJson(){
+  try{
+    const o=JSON.parse(document.getElementById('loadJson').value.trim());
+    Object.assign(state,o);
+    // UI反映
+    document.querySelectorAll('#genreChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.v===state.genre));
+    document.getElementById('genreThemeWrap').classList.toggle('hidden',state.genre!=='limited');
+    document.getElementById('genreTheme').value=state.genreTheme||"";
+    AXES.forEach(a=>{document.getElementById('s_'+a.key).value=state.axis[a.key];
+      document.getElementById('v_'+a.key).textContent=state.axis[a.key];});
+    document.getElementById('dot').style.left=state.mx+'%';
+    document.getElementById('dot').style.top=state.my+'%';
+    readMap();
+    toast("読み込みました。各ステップで内容を確認できます。");
+  }catch(e){toast("読み込み失敗：JSONの形式を確認してください。");}
+}
+function copyText(id){
+  const ta=document.getElementById(id);
+  navigator.clipboard.writeText(ta.value).then(()=>toast("コピーしました")).catch(()=>{
+    ta.removeAttribute('readonly');ta.select();document.execCommand('copy');ta.setAttribute('readonly','');toast("コピーしました");
+  });
+}
+let toastT;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2000);}
+
+/* ============ ステップ遷移 ============ */
+function showStep(n){
+  step=n;
+  document.querySelectorAll('[data-step]').forEach(p=>p.classList.toggle('hidden',+p.dataset.step!==n));
+  document.querySelectorAll('#steps .s').forEach(s=>{
+    const i=+s.dataset.s;s.classList.toggle('active',i===n);s.classList.toggle('done',i<n);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function next(){
+  if(step===0 && !state.genre){toast("ジャンルの方向性を選んでください");return;}
+  if(step<4)showStep(step+1);
+}
+function prev(){if(step>0)showStep(step-1);}
+
+/* ============ 起動 ============ */
+/* Lucideアイコン（埋め込み・ISCライセンス）を data-lucide 属性に描画 */
+function refreshIcons(){
+  document.querySelectorAll('[data-lucide]').forEach(el=>{
+    const name=el.getAttribute('data-lucide');
+    const inner=ICONS[name];
+    if(!inner) return;
+    const svg=`<svg class="lucide lucide-${name}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+    el.outerHTML=svg;
+  });
+}
+initGenre();initSliders();initMap();showStep(0);refreshIcons();
+</script>
+</body>
+</html>
