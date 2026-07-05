@@ -50,6 +50,11 @@
   .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
   h1{font-family:var(--font-disp);font-size:26px;margin:6px 0 4px;letter-spacing:.02em}
   .sub{color:var(--ink-soft);font-size:13px;margin:0}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
+    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
+    border-radius:8px;background:#fff;transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .back-link [data-lucide],.back-link svg{font-size:16px}
 
   /* ステップ進行 */
   .steps{display:flex;gap:6px;margin:18px 0 22px;flex-wrap:wrap}
@@ -179,6 +184,7 @@
     <div class="eyebrow">EXHIBITION CONCEPT BUILDER</div>
     <h1>模型展示会コンセプト設計ツール</h1>
     <p class="sub">企画意図を構造化し、設計の合致を確かめる。模型展示会の主催者のための叩き台メーカー。</p>
+    <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
 
   <div class="steps" id="steps">

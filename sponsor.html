@@ -31,6 +31,11 @@
   .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
   h1{font-family:var(--font-disp);margin:6px 0 4px;font-size:clamp(19px,5.6vw,26px)}
   .sub{color:var(--ink-soft);font-size:13px;margin:0}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
+    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
+    border-radius:8px;background:#fff;transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .back-link [data-lucide],.back-link svg{font-size:16px}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:20px;margin:18px 0}
@@ -164,6 +169,7 @@
     <div class="eyebrow">SPONSOR PROPOSAL GENERATOR</div>
     <h1>協賛提案書ジェネレーター</h1>
     <p class="sub">協賛のお願いを、企業に伝わる提案書に。情報を入れると、松竹梅プランつきの提案書ができます。</p>
+    <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
 
   <section class="panel no-print">
@@ -251,6 +257,7 @@
 <script>
 /* Lucide icons (ISC License) - Copyright (c) Lucide Contributors. https://lucide.dev/license */
 const ICONS={
+  "arrow-left":"<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />",
   "handshake":"<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />",
   "calendar":"<path d=\"M8 2v4\" /> <path d=\"M16 2v4\" /> <rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\" /> <path d=\"M3 10h18\" />",
   "map-pin":"<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />",

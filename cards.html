@@ -29,6 +29,11 @@
   .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
   h1{font-family:var(--font-disp);font-size:25px;margin:6px 0 4px}
   .sub{color:var(--ink-soft);font-size:13px;margin:0}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
+    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
+    border-radius:8px;background:#fff;transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .back-link [data-lucide],.back-link svg{font-size:16px}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:20px;margin:18px 0}
@@ -121,6 +126,7 @@
     <div class="eyebrow">TECHNIQUE CARDS</div>
     <h1>技法札 印刷ツール</h1>
     <p class="sub">来場者が話しかけるきっかけに。作者が卓上に置く「得意技法・話しかけ可否」の札を印刷します。</p>
+    <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
 
   <section class="panel no-print">
@@ -169,6 +175,7 @@
 <script>
 /* Lucide icons (ISC License) - Copyright (c) Lucide Contributors. https://lucide.dev/license */
 const ICONS={
+  "arrow-left":"<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />",
   "brush":"<path d=\"m11 10 3 3\" /> <path d=\"M6.5 21A3.5 3.5 0 1 0 3 17.5a2.62 2.62 0 0 1-.708 1.792A1 1 0 0 0 3 21z\" /> <path d=\"M9.969 17.031 21.378 5.624a1 1 0 0 0-3.002-3.002L6.967 14.031\" />",
   "paintbrush":"<path d=\"m14.622 17.897-10.68-2.913\" /> <path d=\"M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z\" /> <path d=\"M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15\" />",
   "spray-can":"<path d=\"M3 3h.01\" /> <path d=\"M7 5h.01\" /> <path d=\"M11 7h.01\" /> <path d=\"M3 7h.01\" /> <path d=\"M7 9h.01\" /> <path d=\"M3 11h.01\" /> <rect width=\"4\" height=\"4\" x=\"15\" y=\"5\" /> <path d=\"m19 9 2 2v10c0 .6-.4 1-1 1h-6c-.6 0-1-.4-1-1V11l2-2\" /> <path d=\"m13 14 8-2\" /> <path d=\"m13 19 8-2\" />",
