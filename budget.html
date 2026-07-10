@@ -14,6 +14,7 @@
   :root{
     --ink:#1d2530; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
     --paper:#eef2f6; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
+    --navy:#0e2841; --navy-2:#323d4e; --navy-text:#c9d6e4; --navy-muted:#8fa2b8;
     --income:#2f6f8f; --expense:#b8862b; --profit:#2e7d57; --loss:#c8472e;
     --radius:10px; --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
     --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
@@ -26,16 +27,20 @@
   body{margin:0;font-family:var(--font-body);color:var(--ink);background:var(--paper);
     line-height:1.7;font-size:15px}
   .wrap{max-width:760px;margin:0 auto;padding:24px 18px 80px}
-  header.top{padding:18px 0 8px;border-bottom:2px solid var(--ink)}
-  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
-  h1{font-family:var(--font-disp);margin:6px 0 4px;white-space:nowrap;
-    font-size:clamp(16px, 5.7vw, 25px)}
-  .sub{color:var(--ink-soft);font-size:13px;margin:0}
-  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
-    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
-    border-radius:8px;background:#fff;transition:all .12s}
-  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .back-link [data-lucide],.back-link svg{font-size:16px}
+  /* 紺バンドヘッダー（ポータルと統一） */
+  header.top{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;margin:0 0 22px;padding:22px 22px 20px;border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .eyebrow{font-size:11px;letter-spacing:.34em;text-indent:.34em;color:var(--navy-text);font-weight:700}
+  h1{font-family:var(--font-body);font-weight:900;margin:8px 0 0;letter-spacing:.04em;
+    color:#fff;line-height:1.3;white-space:nowrap;font-size:clamp(16px, 5.7vw, 25px)}
+  .top-rule{width:52px;height:2px;background:var(--accent);margin:14px 0 12px}
+  .sub{color:var(--navy-text);font-size:13px;margin:0;line-height:1.7}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:16px 0 0;padding:7px 14px;
+    font-size:12.5px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.28);
+    border-radius:8px;background:rgba(255,255,255,.06);transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:rgba(200,71,46,.18)}
+  .back-link [data-lucide],.back-link svg{font-size:15px}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:20px;margin:18px 0}
@@ -149,7 +154,9 @@
   .suggest .note{font-size:12px;color:var(--ink-soft)}
   .suggest.ok{border-color:var(--profit)} .suggest.ok .big b{color:var(--profit)}
 
-  footer{text-align:center;color:var(--ink-soft);font-size:11px;margin-top:24px}
+  footer{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:var(--navy-text);
+    border-radius:var(--radius);margin-top:34px;padding:20px 22px;text-align:center;font-size:11.5px;line-height:1.8}
+  footer .f-copy{margin-top:8px;color:var(--navy-muted)}
 </style>
 </head>
 <body>
@@ -157,6 +164,7 @@
   <header class="top">
     <div class="eyebrow">MOKEI EVENT BUDGET SIMULATOR</div>
     <h1>模型イベント収支シミュレーター</h1>
+    <div class="top-rule"></div>
     <p class="sub">黒字で終わるか、その場で確かめる。赤字を防ぎ、黒字化の道を具体額で示します。</p>
     <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
@@ -298,7 +306,10 @@
     </div>
   </section>
 
-  <footer>ルールベースで動作・データは端末内のみ・サーバー送信なし</footer>
+  <footer>
+    ルールベースで動作・データは端末内のみ・サーバー送信なし
+    <div class="f-copy">© 2026 bideyuki All Rights Reserved.</div>
+  </footer>
 </div>
 
 <script>

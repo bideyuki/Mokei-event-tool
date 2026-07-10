@@ -12,10 +12,10 @@
 <title>模型イベント運営ツールキット</title>
 <style>
   :root{
-    --ink:#1d2530; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
-    --paper:#eef2f6; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
-    --plan:#2f6f8f; --budget:#b8862b; --day:#2e7d57;
-    --radius:12px; --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
+    --ink:#1a2330; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
+    --paper:#f2f5f8; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
+    --navy:#0e2841; --navy-2:#323d4e; --navy-text:#c9d6e4; --navy-muted:#8fa2b8;
+    --radius:12px; --shadow:0 1px 2px rgba(14,40,65,.06), 0 6px 20px rgba(14,40,65,.07);
     --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
     --font-body:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
   }
@@ -24,67 +24,85 @@
   svg.lucide{width:1em;height:1em;vertical-align:-.14em}
   body{margin:0;font-family:var(--font-body);color:var(--ink);background:var(--paper);
     line-height:1.7;font-size:15px}
-  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+  .wrap{max-width:760px;margin:0 auto;padding:30px 18px 40px}
 
-  header.hero{text-align:center;padding:20px 0 26px;border-bottom:2px solid var(--ink);margin-bottom:26px}
-  .eyebrow{font-size:11px;letter-spacing:.24em;color:var(--accent);font-weight:700}
-  h1{font-family:var(--font-disp);margin:10px 0 8px;font-size:clamp(20px,6.2vw,30px);white-space:nowrap}
-  .hero p{color:var(--ink-soft);font-size:14px;margin:0 auto;max-width:30em}
+  /* ヒーロー：ミカモコ2026の紺バンドを全幅で */
+  .siteband{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:#fff;
+    padding:44px 18px 40px;text-align:center}
+  .sb-in{max-width:760px;margin:0 auto}
+  .sb-eyebrow{font-size:11px;letter-spacing:.5em;text-indent:.5em;color:var(--navy-text);
+    font-weight:700;margin-bottom:14px}
+  .sb-title{margin:0;font-family:var(--font-body);font-weight:900;
+    font-size:clamp(21px,6vw,34px);letter-spacing:.06em;line-height:1.3;white-space:nowrap}
+  .sb-rule{width:56px;height:2px;background:var(--accent);margin:18px auto 16px}
+  .sb-sub{color:var(--navy-text);font-size:13.5px;margin:0 auto;max-width:32em}
 
   .intro{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:20px 22px;margin-bottom:26px}
+    box-shadow:var(--shadow);padding:20px 22px;margin-bottom:28px}
   .intro p{margin:0;font-size:14px}
   .intro p+p{margin-top:10px;color:var(--ink-soft);font-size:13px}
 
-  .sec-label{font-family:var(--font-disp);font-size:16px;margin:0 0 4px}
-  .sec-note{color:var(--ink-soft);font-size:13px;margin:0 0 16px}
-
-  .tools{display:flex;flex-direction:column;gap:16px}
-  a.tool{display:block;text-decoration:none;color:inherit;background:var(--card);
-    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
-    padding:20px 22px;transition:transform .12s, box-shadow .12s, border-color .12s;position:relative}
-  a.tool:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(29,37,48,.1),0 14px 34px rgba(29,37,48,.09);
-    border-color:var(--line-strong)}
-  .tool .top{display:flex;align-items:center;gap:12px}
-  .tool .badge{width:46px;height:46px;flex:0 0 auto;border-radius:11px;display:flex;
-    align-items:center;justify-content:center;font-size:24px;color:#fff}
-  .tool.plan .badge{background:var(--plan)} .tool.budget .badge{background:var(--budget)}
-  .tool.day .badge{background:var(--day)}
-  .tool.sponsor .badge{background:var(--accent)}
-  .tool.sponsor .step{color:var(--accent)}
-  .tool .step{font-size:11px;letter-spacing:.08em;font-weight:700;color:var(--ink-soft)}
-  .tool.plan .step{color:var(--plan)} .tool.budget .step{color:var(--budget)}
-  .tool.day .step{color:var(--day)}
-  .tool h3{font-family:var(--font-disp);font-size:18px;margin:1px 0 0}
-  .tool .desc{font-size:13px;color:var(--ink-soft);margin:12px 0 0}
-  .tool .go{position:absolute;right:20px;top:50%;transform:translateY(-50%);
-    color:var(--line-strong);font-size:20px;transition:color .12s, transform .12s}
-  a.tool:hover .go{color:var(--accent);transform:translateY(-50%) translateX(3px)}
+  .sec-label{font-weight:900;font-size:15px;letter-spacing:.14em;margin:0 0 4px;
+    display:flex;align-items:center;gap:10px}
+  .sec-label::after{content:"";flex:1;height:1px;background:var(--line)}
 
   .flow{display:flex;align-items:center;justify-content:center;gap:8px;margin:2px 0 20px;
     font-size:12px;color:var(--ink-soft);flex-wrap:wrap}
-  .flow b{color:var(--ink);font-weight:700}
+  .flow b{color:var(--navy);font-weight:700}
   .flow [data-lucide]{color:var(--line-strong);font-size:14px}
 
-  footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);
-    text-align:center;color:var(--ink-soft);font-size:12px}
-  .comingsoon{display:inline-flex;align-items:center;gap:6px;background:#f3f6f8;
-    border:1px dashed var(--line-strong);border-radius:999px;padding:6px 16px;font-size:12px;
-    color:var(--ink-soft);margin-bottom:14px}
+  /* ツールカード＝ミニ作品カード（紺バンド＋白ボディ） */
+  .tools{display:flex;flex-direction:column;gap:16px}
+  a.tool{display:block;text-decoration:none;color:inherit;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    overflow:hidden;transition:transform .14s, box-shadow .14s}
+  a.tool:hover{transform:translateY(-2px);
+    box-shadow:0 4px 10px rgba(14,40,65,.12),0 14px 34px rgba(14,40,65,.1)}
+  .tool .tband{background:linear-gradient(120deg,var(--navy),var(--navy-2));color:#fff;
+    padding:11px 18px 10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    border-bottom:3px solid transparent;transition:border-color .14s}
+  a.tool:hover .tband{border-bottom-color:var(--accent)}
+  .tool .step{font-size:10.5px;letter-spacing:.22em;font-weight:700;color:var(--navy-text);
+    flex:0 0 auto}
+  .tool h3{font-family:var(--font-body);font-weight:900;font-size:16.5px;letter-spacing:.04em;
+    margin:0;display:inline-flex;align-items:center;gap:8px}
+  .tool h3 [data-lucide],.tool h3 svg{font-size:16px;color:var(--navy-text)}
+  .tool .tbody{padding:14px 18px 16px;position:relative}
+  .tool .desc{font-size:13px;color:var(--ink-soft);margin:0;padding-right:34px}
+  .tool .go{position:absolute;right:16px;top:50%;transform:translateY(-50%);
+    color:var(--line-strong);font-size:20px;transition:color .14s, transform .14s}
+  a.tool:hover .go{color:var(--accent);transform:translateY(-50%) translateX(3px)}
+
+  /* フッター：紺の帯（カード型） */
+  .sitefoot{background:var(--navy);color:var(--navy-text);border-radius:var(--radius);
+    margin-top:36px;padding:24px 20px;text-align:center;font-size:12px}
+  .comingsoon{display:inline-flex;align-items:center;gap:6px;
+    border:1px dashed rgba(255,255,255,.4);border-radius:999px;padding:6px 16px;
+    font-size:12px;color:var(--navy-text);margin-bottom:14px}
+  .sitefoot .sf-copy{margin-top:10px;color:var(--navy-muted)}
+
   @media(max-width:520px){
-    .wrap{padding:20px 14px 70px}
+    .wrap{padding:22px 14px 36px}
+    .siteband{padding:34px 14px 30px}
     .tool .go{display:none}
-    a.tool{padding:18px}
+    .tool .desc{padding-right:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    a.tool,.tool .tband,.tool .go{transition:none}
+    a.tool:hover{transform:none}
   }
 </style>
 </head>
 <body>
+<header class="siteband">
+  <div class="sb-in">
+    <div class="sb-eyebrow">MOKEI EVENT TOOLKIT</div>
+    <h1 class="sb-title">模型イベント運営ツールキット</h1>
+    <div class="sb-rule"></div>
+    <p class="sb-sub">模型展示会をひらく人のための、無料の運営ツール集。企画から当日まで、主催の各段階をサポートします。</p>
+  </div>
+</header>
 <div class="wrap">
-  <header class="hero">
-    <div class="eyebrow">MOKEI EVENT TOOLKIT</div>
-    <h1>模型イベント運営ツールキット</h1>
-    <p>模型展示会をひらく人のための、無料の運営ツール集。企画から当日まで、主催の各段階をサポートします。</p>
-  </header>
 
   <section class="intro">
     <p>模型展示会を主催してきた経験から生まれた、実務で使えるツールをまとめました。</p>
@@ -98,72 +116,67 @@
   </div>
 
   <div class="tools">
-    <a class="tool plan" href="concept.html" target="_blank" rel="noopener noreferrer">
-      <div class="top">
-        <div class="badge"><i data-lucide="lightbulb"></i></div>
-        <div>
-          <div class="step">STEP 1 ・ 企画</div>
-          <h3>コンセプト設計ツール</h3>
-        </div>
+    <a class="tool" href="concept.html" target="_blank" rel="noopener noreferrer">
+      <div class="tband">
+        <span class="step">STEP 1 ・ 企画</span>
+        <h3><i data-lucide="lightbulb"></i>コンセプト設計ツール</h3>
       </div>
-      <p class="desc">「どんなイベントにしたいか」を、6つの観点と2つの軸で整理。企画意図を言葉にし、要件定義・コンセプト骨子まで自動で組み立てます。ステークホルダーへの共有にも。</p>
-      <span class="go"><i data-lucide="arrow-right"></i></span>
+      <div class="tbody">
+        <p class="desc">「どんなイベントにしたいか」を、6つの観点と2つの軸で整理。企画意図を言葉にし、要件定義・コンセプト骨子まで自動で組み立てます。ステークホルダーへの共有にも。</p>
+        <span class="go"><i data-lucide="arrow-right"></i></span>
+      </div>
     </a>
 
-    <a class="tool budget" href="budget.html" target="_blank" rel="noopener noreferrer">
-      <div class="top">
-        <div class="badge"><i data-lucide="calculator"></i></div>
-        <div>
-          <div class="step">STEP 2 ・ 予算</div>
-          <h3>収支シミュレーター</h3>
-        </div>
+    <a class="tool" href="budget.html" target="_blank" rel="noopener noreferrer">
+      <div class="tband">
+        <span class="step">STEP 2 ・ 予算</span>
+        <h3><i data-lucide="calculator"></i>収支シミュレーター</h3>
       </div>
-      <p class="desc">黒字で終わるか、その場で確認。出展料・入場料・協賛から収支を計算し、赤字なら黒字化の道を具体額で提示。会場・印刷・備品の見積例やExcel書き出しも。</p>
-      <span class="go"><i data-lucide="arrow-right"></i></span>
+      <div class="tbody">
+        <p class="desc">黒字で終わるか、その場で確認。出展料・入場料・協賛から収支を計算し、赤字なら黒字化の道を具体額で提示。会場・印刷・備品の見積例やExcel書き出しも。</p>
+        <span class="go"><i data-lucide="arrow-right"></i></span>
+      </div>
     </a>
 
-    <a class="tool day" href="cards.html" target="_blank" rel="noopener noreferrer">
-      <div class="top">
-        <div class="badge"><i data-lucide="printer"></i></div>
-        <div>
-          <div class="step">STEP 3 ・ 準備</div>
-          <h3>技法札 印刷ツール</h3>
-        </div>
+    <a class="tool" href="cards.html" target="_blank" rel="noopener noreferrer">
+      <div class="tband">
+        <span class="step">STEP 3 ・ 準備</span>
+        <h3><i data-lucide="printer"></i>技法札 印刷ツール</h3>
       </div>
-      <p class="desc">来場者が話しかけるきっかけに。作者の得意技法や「話しかけOK」を示す卓上札を、選んで印刷するだけ。初対面でも会話が生まれる仕掛けをつくります。</p>
-      <span class="go"><i data-lucide="arrow-right"></i></span>
+      <div class="tbody">
+        <p class="desc">来場者が話しかけるきっかけに。作者の得意技法や「話しかけOK」を示す卓上札を、選んで印刷するだけ。初対面でも会話が生まれる仕掛けをつくります。</p>
+        <span class="go"><i data-lucide="arrow-right"></i></span>
+      </div>
     </a>
 
-    <a class="tool day" href="workcard.html" target="_blank" rel="noopener noreferrer">
-      <div class="top">
-        <div class="badge"><i data-lucide="tag"></i></div>
-        <div>
-          <div class="step">STEP 3 ・ 準備</div>
-          <h3>作品カードジェネレーター</h3>
-        </div>
+    <a class="tool" href="workcard.html" target="_blank" rel="noopener noreferrer">
+      <div class="tband">
+        <span class="step">STEP 3 ・ 準備</span>
+        <h3><i data-lucide="tag"></i>作品カードジェネレーター</h3>
       </div>
-      <p class="desc">展示作品に添える名刺サイズの説明カード。使う項目を選んで空欄カードを印刷し、当日作者が手書きで記入。作品名・こだわりなどが伝わり、会話のきっかけにもなります。</p>
-      <span class="go"><i data-lucide="arrow-right"></i></span>
+      <div class="tbody">
+        <p class="desc">展示作品に添える名刺サイズの説明カード。使う項目を選んで空欄カードを印刷し、当日作者が手書きで記入。作品名・こだわりなどが伝わり、会話のきっかけにもなります。</p>
+        <span class="go"><i data-lucide="arrow-right"></i></span>
+      </div>
     </a>
 
-    <a class="tool sponsor" href="sponsor.html" target="_blank" rel="noopener noreferrer">
-      <div class="top">
-        <div class="badge"><i data-lucide="handshake"></i></div>
-        <div>
-          <div class="step">協賛・資金</div>
-          <h3>協賛提案書ジェネレーター</h3>
-        </div>
+    <a class="tool" href="sponsor.html" target="_blank" rel="noopener noreferrer">
+      <div class="tband">
+        <span class="step">協賛・資金</span>
+        <h3><i data-lucide="handshake"></i>協賛提案書ジェネレーター</h3>
       </div>
-      <p class="desc">協賛のお願いを、企業に伝わる提案書に。イベント情報と松竹梅プランを入れるだけで、見返り一覧つきの提案書ができます。印刷・PDFでそのまま渡せます。</p>
-      <span class="go"><i data-lucide="arrow-right"></i></span>
+      <div class="tbody">
+        <p class="desc">協賛のお願いを、企業に伝わる提案書に。イベント情報と松竹梅プランを入れるだけで、見返り一覧つきの提案書ができます。印刷・PDFでそのまま渡せます。</p>
+        <span class="go"><i data-lucide="arrow-right"></i></span>
+      </div>
     </a>
   </div>
 
-  <footer>
+  <footer class="sitefoot">
     <div class="comingsoon"><i data-lucide="sparkles"></i> 企画・運営の個別相談は準備中です</div>
     <div>模型イベント運営ツールキット</div>
     <div style="margin-top:4px">すべてブラウザ内で動作・データは端末内のみ・サーバー送信なし</div>
-    <div style="margin-top:12px">© 2026 bideyuki All Rights Reserved.</div>
+    <div class="sf-copy">© 2026 bideyuki All Rights Reserved.</div>
   </footer>
 </div>
 

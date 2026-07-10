@@ -14,6 +14,7 @@
   :root{
     --ink:#1d2530; --ink-soft:#5a6675; --line:#c9d2dc; --line-strong:#9aa7b5;
     --paper:#eef2f6; --card:#ffffff; --accent:#c8472e; --accent-soft:#f6e3de;
+    --navy:#0e2841; --navy-2:#323d4e; --navy-text:#c9d6e4; --navy-muted:#8fa2b8;
     --plan-ume:#7a8794; --plan-take:#2f6f8f; --plan-matsu:#b8862b;
     --radius:10px; --shadow:0 1px 2px rgba(29,37,48,.06), 0 6px 20px rgba(29,37,48,.06);
     --font-disp:"Hiragino Mincho ProN","Yu Mincho",serif;
@@ -27,15 +28,23 @@
     line-height:1.7;font-size:15px}
   .wrap{max-width:780px;margin:0 auto;padding:24px 18px 90px}
 
-  header.top{padding:18px 0 8px;border-bottom:2px solid var(--ink)}
-  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
-  h1{font-family:var(--font-disp);margin:6px 0 4px;font-size:clamp(19px,5.6vw,26px)}
-  .sub{color:var(--ink-soft);font-size:13px;margin:0}
-  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
-    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
-    border-radius:8px;background:#fff;transition:all .12s}
-  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .back-link [data-lucide],.back-link svg{font-size:16px}
+  /* 紺バンドヘッダー（ポータルと統一） */
+  header.top{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;margin:0 0 22px;padding:22px 22px 20px;border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .eyebrow{font-size:11px;letter-spacing:.34em;text-indent:.34em;color:var(--navy-text);font-weight:700}
+  h1{font-family:var(--font-body);font-weight:900;margin:8px 0 0;letter-spacing:.04em;
+    color:#fff;line-height:1.3;font-size:clamp(19px,5.6vw,26px)}
+  .top-rule{width:52px;height:2px;background:var(--accent);margin:14px 0 12px}
+  .sub{color:var(--navy-text);font-size:13px;margin:0;line-height:1.7}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:16px 0 0;padding:7px 14px;
+    font-size:12.5px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.28);
+    border-radius:8px;background:rgba(255,255,255,.06);transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:rgba(200,71,46,.18)}
+  .back-link [data-lucide],.back-link svg{font-size:15px}
+  footer{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:var(--navy-text);
+    border-radius:var(--radius);margin-top:34px;padding:20px 22px;text-align:center;font-size:11.5px;line-height:1.8}
+  footer .f-copy{margin-top:8px;color:var(--navy-muted)}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     box-shadow:var(--shadow);padding:20px;margin:18px 0}
@@ -168,6 +177,7 @@
   <header class="top no-print">
     <div class="eyebrow">SPONSOR PROPOSAL GENERATOR</div>
     <h1>協賛提案書ジェネレーター</h1>
+    <div class="top-rule"></div>
     <p class="sub">協賛のお願いを、企業に伝わる提案書に。情報を入れると、松竹梅プランつきの提案書ができます。</p>
     <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
@@ -252,6 +262,11 @@
   </section>
 
   <div id="docWrap"></div>
+
+  <footer class="no-print">
+    協賛提案書ジェネレーター・ルールベースで動作・データは端末内のみ・サーバー送信なし
+    <div class="f-copy">© 2026 bideyuki All Rights Reserved.</div>
+  </footer>
 </div>
 
 <script>

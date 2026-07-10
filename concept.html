@@ -24,6 +24,7 @@
     --card:#ffffff;
     --accent:#c8472e;       /* 朱色アクセント（1点のみ） */
     --accent-soft:#f6e3de;
+    --navy:#0e2841; --navy-2:#323d4e; --navy-text:#c9d6e4; --navy-muted:#8fa2b8;
     --must:#c8472e;
     --should:#2f6f8f;
     --could:#7a8794;
@@ -46,15 +47,20 @@
     line-height:1.7;font-size:15px;
   }
   .wrap{max-width:780px;margin:0 auto;padding:24px 18px 80px}
-  header.top{padding:18px 0 8px;border-bottom:2px solid var(--ink)}
-  .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
-  h1{font-family:var(--font-disp);font-size:26px;margin:6px 0 4px;letter-spacing:.02em}
-  .sub{color:var(--ink-soft);font-size:13px;margin:0}
-  .back-link{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;padding:8px 14px;
-    font-size:13px;color:var(--accent);text-decoration:none;border:1px solid var(--line);
-    border-radius:8px;background:#fff;transition:all .12s}
-  .back-link:hover{border-color:var(--accent);background:var(--accent-soft)}
-  .back-link [data-lucide],.back-link svg{font-size:16px}
+  /* 紺バンドヘッダー（ポータルと統一） */
+  header.top{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);
+    color:#fff;margin:0 0 22px;padding:22px 22px 20px;border-radius:var(--radius);
+    box-shadow:var(--shadow)}
+  .eyebrow{font-size:11px;letter-spacing:.34em;text-indent:.34em;color:var(--navy-text);font-weight:700}
+  h1{font-family:var(--font-body);font-weight:900;font-size:23px;margin:8px 0 0;
+    letter-spacing:.04em;color:#fff;line-height:1.3}
+  .top-rule{width:52px;height:2px;background:var(--accent);margin:14px 0 12px}
+  .sub{color:var(--navy-text);font-size:13px;margin:0;line-height:1.7}
+  .back-link{display:inline-flex;align-items:center;gap:6px;margin:16px 0 0;padding:7px 14px;
+    font-size:12.5px;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.28);
+    border-radius:8px;background:rgba(255,255,255,.06);transition:all .12s}
+  .back-link:hover{border-color:var(--accent);background:rgba(200,71,46,.18)}
+  .back-link [data-lucide],.back-link svg{font-size:15px}
 
   /* ステップ進行 */
   .steps{display:flex;gap:6px;margin:18px 0 22px;flex-wrap:wrap}
@@ -170,7 +176,9 @@
     opacity:0;transition:all .25s;pointer-events:none;z-index:50}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  footer{text-align:center;color:var(--ink-soft);font-size:11px;margin-top:30px}
+  footer{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:var(--navy-text);
+    border-radius:var(--radius);margin-top:34px;padding:20px 22px;text-align:center;font-size:11.5px;line-height:1.8}
+  footer .f-copy{margin-top:8px;color:var(--navy-muted)}
   @media(max-width:520px){
     .wrap{padding:16px 12px 70px}
     h1{font-size:22px}
@@ -183,6 +191,7 @@
   <header class="top">
     <div class="eyebrow">EXHIBITION CONCEPT BUILDER</div>
     <h1>模型展示会コンセプト設計ツール</h1>
+    <div class="top-rule"></div>
     <p class="sub">企画意図を構造化し、設計の合致を確かめる。模型展示会の主催者のための叩き台メーカー。</p>
     <a href="index.html" class="back-link"><i data-lucide="arrow-left"></i>ツール一覧に戻る</a>
   </header>
@@ -283,7 +292,10 @@
     <div class="nav" style="margin-top:18px"><button class="btn ghost" onclick="prev()"><i data-lucide="arrow-left"></i>戻る</button><span></span></div>
   </section>
 
-  <footer>ルールベースで動作・データは端末内のみ・サーバー送信なし</footer>
+  <footer>
+    ルールベースで動作・データは端末内のみ・サーバー送信なし
+    <div class="f-copy">© 2026 bideyuki All Rights Reserved.</div>
+  </footer>
 </div>
 
 <div class="toast" id="toast"></div>
